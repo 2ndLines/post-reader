@@ -12,7 +12,7 @@
 | [P0-REPO-02](P0-REPO-02.md) | 规则文件与文档导入收尾 | REPO-01 | 审阅各端 AGENTS.md | PR 待审阅；AC3 待负责人 |
 | [P0-CI-01](P0-CI-01.md) | `ci` 工作流与分支保护 | REPO-01 | 在 GitHub 开启分支保护 | PR 待审阅；AC4 待负责人 |
 | [P0-REPO-03](P0-REPO-03.md) | 本地钩子、CODEOWNERS、PR 模板 | REPO-01、CI-01 | — | PR 待审阅；AC2 待负责人 |
-| [P0-REPO-04](P0-REPO-04.md) | 助手工具配置（权限、钩子、skills、子代理、MCP） | REPO-02 | 审阅全部 `.claude/`；配置只读 PAT | 待开始 |
+| [P0-REPO-04](P0-REPO-04.md) | 助手工具配置（权限、钩子、skills、子代理、MCP） | REPO-02 | 审阅全部 `.claude/`；配置只读 PAT | PR 待审阅；AC4 待新会话 |
 | [P0-REPO-05](P0-REPO-05.md) | 本地容器环境与验证项 V1、V4、V5 | REPO-01 | V5 需两区云账号只读查询 | PR 待审阅；V5 API 复核待负责人 |
 
 建议顺序：REPO-01 → CI-01 → REPO-03 → REPO-02 → REPO-04；REPO-05 在 REPO-01 之后即可并行。

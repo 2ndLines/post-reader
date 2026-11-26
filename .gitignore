@@ -6,3 +6,7 @@ node_modules/
 *.bundle
 .turbo/
 coverage/
+
+# Claude Code：个人覆盖与运行状态不入库（05 §6.1）
+.claude/settings.local.json
+.claude/state/
