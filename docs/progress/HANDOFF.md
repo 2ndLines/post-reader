@@ -27,7 +27,7 @@ Post&Comments Reader：用户把社交平台帖子链接分享、粘贴或扫码
 | `docs/archs/02-backend.md` | v1.2 | 后端；§9 计费两层计量、§18–§21 增补、§22 长远方案、§23 规格补全 |
 | `docs/archs/03-admin-console.md` | v1.2 | 管理后台架构 |
 | `docs/archs/04-testbench.md` | v1.2 | 测试台架架构；§15 长远方案与计费标定套件 |
-| `docs/archs/05-toolchain-and-resources.md` | v1.3 | 依赖与外部资源的唯一登记处 |
+| `docs/archs/05-toolchain-and-resources.md` | v1.4 | 依赖与外部资源的唯一登记处 |
 | `docs/adr/` | 0001–0016 | 已拍板的架构决策 |
 | `docs/archs/ai-dev-playbook.md` | v1.1 | AI 开发手册：工作循环、路线图 P0–P12、LT-01–LT-07 长远方案任务 |
 | `docs/archs/技术选型分析.md`、`docs/archs/完整技术架构.md` | 在线文档导出 | 在线文档两个标签页的 Markdown 副本；架构 02 中「完整技术架构第 N 节」指后者 |

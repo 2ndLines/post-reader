@@ -1,0 +1,7 @@
+{
+  "extends": "@post-reader/tooling/tsconfig.base.json",
+  "include": ["src/**/*.ts", "vitest.config.ts"],
+  "compilerOptions": {
+    "erasableSyntaxOnly": true
+  }
+}
