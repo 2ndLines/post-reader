@@ -6,7 +6,7 @@
 | v1.1 变更 | 文档优先级更新到主 PRD v2.7 草案与三份子 PRD v1.3；新增 P7–P11 闭环任务；未决事项按「未决前的默认」实现（00 D16） |
 | 读者 | 负责开发本项目的 AI 编程助手（下称「助手」）与项目负责人（下称「负责人」） |
 | 目标 | 指导助手在负责人监督下，从空仓库开始完成 iOS 客户端、后端、管理后台、测试台架的开发、测试、部署与上线发布 |
-| 存放位置 | 仓库 `docs/ai-dev-playbook.md`；根目录 `AGENTS.md` 引用本文 |
+| 存放位置 | 仓库 `docs/archs/ai-dev-playbook.md`；根目录 `AGENTS.md` 引用本文 |
 
 ---
 
@@ -19,15 +19,15 @@
 | 优先级 | 文档 | 位置 | 说明 |
 | --- | --- | --- | --- |
 | 1 | 负责人在当前任务中的明确指示 | 任务卡 / 对话 | 仅对当前任务生效 |
-| 2 | 产品需求 | `docs/prd/prd.md`（主 PRD v2.7 草案）、`prd-ios.md`（v1.3）、`prd-admin-console.md`（v1.3）、`prd-testbench.md`（v1.3）、`prd-closure-review.md` | 「做什么」的唯一依据 |
+| 2 | 产品需求 | `docs/prds/prd.md`（主 PRD v2.7 草案）、`prd-ios.md`（v1.3）、`prd-admin-console.md`（v1.3）、`prd-testbench.md`（v1.3）、`prd-closure-review.md` | 「做什么」的唯一依据 |
 | 3 | 架构决策记录 | `docs/adr/` | 记录已拍板的取舍，晚于架构文档的 ADR 优先 |
-| 4 | 架构设计 | `docs/architecture/00`–`05` | 「怎么做」的依据；05 是依赖与外部资源的唯一登记处 |
-| 5 | 本指南 | `docs/ai-dev-playbook.md` | 「怎么干活」的依据 |
+| 4 | 架构设计 | `docs/archs/00`–`05` | 「怎么做」的依据；05 是依赖与外部资源的唯一登记处 |
+| 5 | 本指南 | `docs/archs/ai-dev-playbook.md` | 「怎么干活」的依据 |
 | 6 | 各端 `AGENTS.md` | `apps/*/AGENTS.md` | 局部约定，不得与以上冲突 |
 
 ### 0.2 阅读顺序
 
-- **第一次进入仓库**：本指南第 1–6 节 → 根 `AGENTS.md` → `docs/architecture/00-overview.md` → `docs/progress/STATUS.md`。
+- **第一次进入仓库**：本指南第 1–6 节 → 根 `AGENTS.md` → `docs/archs/00-overview.md` → `docs/progress/STATUS.md`。
 - **每个任务开始前**：任务卡 → 任务卡列出的 PRD 章节与架构章节 → 相关 `apps/*/AGENTS.md` → 本指南第 7 节对应的标准作业程序。
 - **不需要每次通读全部文档**。只读任务需要的部分，读过的结论写进任务卡的「上下文摘要」，避免重复消耗上下文。
 
@@ -644,7 +644,7 @@ apps/ios/Packages/{Storage,Networking,Commerce}/**
 apps/ios/Packages/Audio/Sources/Audio/NowPlayingBridge*
 apps/ios/App/*.entitlements apps/ios/App/Info.plist apps/ios/Config/Pins.xcconfig
 infra/** .github/workflows/**
-AGENTS.md docs/ai-dev-playbook.md
+AGENTS.md docs/archs/ai-dev-playbook.md
 ```
 
 ---
@@ -745,9 +745,9 @@ AGENTS.md docs/ai-dev-playbook.md
 国内与海外两套独立部署，数据不互通。
 
 ## 先读
-- 工作方法：docs/ai-dev-playbook.md（第 3 节工作循环、第 9 节完成定义）
-- 架构：docs/architecture/00-overview.md，再按任务读 01–05（05 为依赖登记）
-- 需求：docs/prd/
+- 工作方法：docs/archs/ai-dev-playbook.md（第 3 节工作循环、第 9 节完成定义）
+- 架构：docs/archs/00-overview.md，再按任务读 01–05（05 为依赖登记）
+- 需求：docs/prds/
 - 进度：docs/progress/STATUS.md
 
 ## 目录
@@ -875,7 +875,7 @@ P3 · 同语种流水线（出口条件 2/3 已满足）
 **开始一个任务**
 
 ```text
-请按 docs/ai-dev-playbook.md 第 3 节的工作循环完成任务卡 docs/tasks/P3-PIPE-02.md。
+请按 docs/archs/ai-dev-playbook.md 第 3 节的工作循环完成任务卡 docs/tasks/P3-PIPE-02.md。
 先只做第 1–3 步：读取任务卡列出的文档，填写「上下文摘要」与「计划」，然后停下等我确认。
 ```
 
@@ -889,6 +889,6 @@ P3 · 同语种流水线（出口条件 2/3 已满足）
 **阶段评审**
 
 ```text
-P3 已接近完成。请按 docs/ai-dev-playbook.md 第 6.5 节的出口条件逐条核对，
+P3 已接近完成。请按 docs/archs/ai-dev-playbook.md 第 6.5 节的出口条件逐条核对，
 列出满足情况与证据链接、遗留问题、对下一阶段的风险，写入 docs/progress/P3-review.md。
 ```

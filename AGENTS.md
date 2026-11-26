@@ -5,9 +5,10 @@
 
 ## 先读
 - 交接摘要：docs/progress/HANDOFF.md（设计阶段的结论、原则与待办，新会话必读）
-- 工作方法：docs/ai-dev-playbook.md（第 3 节工作循环、第 9 节完成定义）
-- 架构：docs/architecture/00-overview.md，再按任务读 01–05（05 为依赖登记）
-- 需求：docs/prd/（主 PRD v2.7 草案、iOS / 管理后台 / 测试台架 PRD v1.3、业务闭环评审）
+- 工作方法：docs/archs/ai-dev-playbook.md（第 3 节工作循环、第 9 节完成定义）
+- 架构：docs/archs/00-overview.md，再按任务读 01–05（05 为依赖登记）
+- 需求：docs/prds/（主 PRD v2.7 草案、iOS / 管理后台 / 测试台架 PRD v1.3）；业务闭环评审在 docs/archs/prd-closure-review.md
+- 技术选型与完整架构：docs/archs/技术选型分析.md、docs/archs/完整技术架构.md（在线文档导出副本）
 - 决策：docs/adr/（0001–0016；晚于架构文档的 ADR 优先）
 - 进度：docs/progress/STATUS.md
 
@@ -37,7 +38,7 @@ pnpm testbench run --suite pr --region intl
 - 杜绝临时方案与「以后再换」：技术链路、协议、数据模型、存储、部署按长期业务形态一次选对；功能范围可分期，扩展点从第一版预留。
 - 待确认事项未决前一律按各表「未决前的默认」实现，默认值写入配置，不在代码中写死（ADR 0004）。
 - 主体后端 Fastify；海外边缘层 Hono + Cloudflare Workers；边缘不承载业务逻辑与状态（ADR 0006）。
-- 文档以本仓库 Markdown 为准；在线文档《技术选型分析》只作副本。
+- 文档以本仓库 Markdown 为准；在线文档《技术选型分析》不再作为主版本维护。
 
 ## 完成定义
 测试先行 → 相关检查全绿 → 文档同步 → 自审清单 → PR 附证据 → 更新 STATUS.md

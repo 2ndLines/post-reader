@@ -28,4 +28,3 @@ P0 之前 · 设计基线已完成，等待合规确认与供应商选型；P0 �
 ## 下一步建议
 1. P0 工程基座：monorepo、CI、依赖治理、`packages/contracts`（含跳章 WS 消息）、`canonical-spec` 黄金向量、`packages/signed-url`
 2. 风险原型：iOS 切片播放与跳章、WebKit 登录凭证、AudioSeal 水印开销、首段延迟（真实厂商）
-3. 把在线文档两个标签页导出为 Markdown 放入 `docs/tech-selection/`

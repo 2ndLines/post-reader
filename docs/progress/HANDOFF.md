@@ -1,6 +1,6 @@
 # 交接摘要：设计阶段（2026-11-22 至 2026-11-26）
 
-本文是设计阶段对话的交接摘要，供新的开发会话（Claude Code 或其他 AI 编程助手）快速接手。对话本身不随仓库迁移；凡是对话中形成的结论，都已写入下列文档，本文只做索引与提要。**文档与本文冲突时，以文档为准；文档之间冲突时，按 `docs/ai-dev-playbook.md` §0 的优先级处理。**
+本文是设计阶段对话的交接摘要，供新的开发会话（Claude Code 或其他 AI 编程助手）快速接手。对话本身不随仓库迁移；凡是对话中形成的结论，都已写入下列文档，本文只做索引与提要。**文档与本文冲突时，以文档为准；文档之间冲突时，按 `docs/archs/ai-dev-playbook.md` §0 的优先级处理。**
 
 ## 1. 项目一句话
 
@@ -17,20 +17,20 @@ Post&Comments Reader：用户把社交平台帖子链接分享、粘贴或扫码
 
 | 文档 | 版本 | 说明 |
 | --- | --- | --- |
-| `docs/prd/prd.md` | v2.7 草案 | 主 PRD；第 13 节为待确认事项 U1–U28 |
-| `docs/prd/prd-ios.md` | v1.3 | iOS 客户端 PRD；第 10 节待确认 Q1–Q10 |
-| `docs/prd/prd-admin-console.md` | v1.3 | 管理后台 PRD；第 10 节 Q1–Q18 |
-| `docs/prd/prd-testbench.md` | v1.3 | 后端 Web 测试台架 PRD；门禁 G1–G16；第 10 节 Q1–Q17 |
-| `docs/prd/prd-closure-review.md` | — | 业务闭环评审：第一至第四轮、统一额度池变更（§10）、长远方案修订（§11） |
-| `docs/architecture/00-overview.md` | v1.2 | 总览、仓库结构、共享契约（含 WS 消息）、`config/` 清单、待决策项 D1–D24 |
-| `docs/architecture/01-ios-client.md` | v1.3 | iOS 架构；§22 闭环增补、§23 Liquid Glass、§24 长远方案 |
-| `docs/architecture/02-backend.md` | v1.2 | 后端；§9 计费两层计量、§18–§21 增补、§22 长远方案、§23 规格补全 |
-| `docs/architecture/03-admin-console.md` | v1.2 | 管理后台架构 |
-| `docs/architecture/04-testbench.md` | v1.2 | 测试台架架构；§15 长远方案与计费标定套件 |
-| `docs/architecture/05-toolchain-and-resources.md` | v1.2 | 依赖与外部资源的唯一登记处 |
+| `docs/prds/prd.md` | v2.7 草案 | 主 PRD；第 13 节为待确认事项 U1–U28 |
+| `docs/prds/prd-ios.md` | v1.3 | iOS 客户端 PRD；第 10 节待确认 Q1–Q10 |
+| `docs/prds/prd-admin-console.md` | v1.3 | 管理后台 PRD；第 10 节 Q1–Q18 |
+| `docs/prds/prd-testbench.md` | v1.3 | 后端 Web 测试台架 PRD；门禁 G1–G16；第 10 节 Q1–Q17 |
+| `docs/archs/prd-closure-review.md` | — | 业务闭环评审：第一至第四轮、统一额度池变更（§10）、长远方案修订（§11） |
+| `docs/archs/00-overview.md` | v1.2 | 总览、仓库结构、共享契约（含 WS 消息）、`config/` 清单、待决策项 D1–D24 |
+| `docs/archs/01-ios-client.md` | v1.3 | iOS 架构；§22 闭环增补、§23 Liquid Glass、§24 长远方案 |
+| `docs/archs/02-backend.md` | v1.2 | 后端；§9 计费两层计量、§18–§21 增补、§22 长远方案、§23 规格补全 |
+| `docs/archs/03-admin-console.md` | v1.2 | 管理后台架构 |
+| `docs/archs/04-testbench.md` | v1.2 | 测试台架架构；§15 长远方案与计费标定套件 |
+| `docs/archs/05-toolchain-and-resources.md` | v1.2 | 依赖与外部资源的唯一登记处 |
 | `docs/adr/` | 0001–0016 | 已拍板的架构决策 |
-| `docs/ai-dev-playbook.md` | v1.1 | AI 开发手册：工作循环、路线图 P0–P12、LT-01–LT-07 长远方案任务 |
-| `docs/tech-selection/` | 待导出 | 在线文档两个标签页（见该目录 README） |
+| `docs/archs/ai-dev-playbook.md` | v1.1 | AI 开发手册：工作循环、路线图 P0–P12、LT-01–LT-07 长远方案任务 |
+| `docs/archs/技术选型分析.md`、`docs/archs/完整技术架构.md` | 在线文档导出 | 在线文档两个标签页的 Markdown 副本；架构 02 中「完整技术架构第 N 节」指后者 |
 
 ## 4. 关键决策提要
 
@@ -78,16 +78,15 @@ Post&Comments Reader：用户把社交平台帖子链接分享、粘贴或扫码
 | 负责人 | 供应商选型与合同（国内备案依赖它，周期最长） | 未定 | 05 §3.6 |
 | 负责人 | 各档位目标「成本 ÷ 点数」 | 未给出 | ADR 0016 |
 | 负责人 | 主 PRD v2.7 定稿 | 以上确认后 | D14 |
-| 仓库 | 导出在线文档两个标签页 | — | `docs/tech-selection/` |
 
 其余待确认项见主 PRD 第 13 节与各子 PRD 第 10 节，均按默认执行。
 
 ## 7. 下一步
 
-1. **P0 工程基座**（不依赖任何待确认项）：按 `docs/ai-dev-playbook.md` §6 建 monorepo、CI、依赖治理（05 §2）；先写 `packages/contracts`（含跳章与单篇上限的 WS 消息）、`packages/canonical-spec` 黄金向量、`packages/signed-url`（LT-01）。
+1. **P0 工程基座**（不依赖任何待确认项）：按 `docs/archs/ai-dev-playbook.md` §6 建 monorepo、CI、依赖治理（05 §2）；先写 `packages/contracts`（含跳章与单篇上限的 WS 消息）、`packages/canonical-spec` 黄金向量、`packages/signed-url`（LT-01）。
 2. **风险原型**：iOS 切片下载 + 校验 + 无缝拼接与跳章；WebKit 站点登录凭证保持；AudioSeal 嵌入开销与 AAC / 边缘分发后的检出；真实厂商下的首段延迟。
 3. 每完成一项更新 `docs/progress/STATUS.md`；新决策写 ADR。
 
 ## 8. 新会话启动提示词
 
-> 先读 AGENTS.md、docs/progress/HANDOFF.md 与 docs/progress/STATUS.md。然后按 docs/ai-dev-playbook.md 第 6 节，为 P0 生成任务卡（docs/tasks/），列出计划后等待我确认再开始。
+> 先读 AGENTS.md、docs/progress/HANDOFF.md 与 docs/progress/STATUS.md。然后按 docs/archs/ai-dev-playbook.md 第 6 节，为 P0 生成任务卡（docs/tasks/），列出计划后等待我确认再开始。
