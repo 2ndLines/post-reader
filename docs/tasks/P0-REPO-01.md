@@ -137,6 +137,7 @@ CI 工作流（P0-CI-01）、git 钩子（P0-REPO-03）、Docker（P0-REPO-05）
 - **验收证据**（在干净克隆中运行）：
   - **AC1**：`mise trust && mise install && pnpm i --frozen-lockfile && pnpm verify` 退出码 0。node 为 v26.13.1，pnpm 为 12.23.0；3 个任务全部成功。
   - **AC2**：在 `sum.ts` 中写入类型错误后，`pnpm verify` 退出码 1，报错为 `error TS2322: Type 'string' is not assignable to type 'number'`，失败任务是 `@post-reader/tooling#typecheck`。还原后退出码 0。
+  - **Biome 反向验证**：只在 `packages/tooling/example/sum.ts` 中写入格式错误，其他文件不动。`//#lint` 未命中缓存而重新执行，`pnpm verify` 退出码 1。说明根级 lint 任务的缓存哈希覆盖各包文件，缓存不会掩盖子包里的错误。
   - **AC3**：连续运行两次 `turbo run verify`，第二次显示 `Cached: 3 cached, 3 total`、`FULL TURBO`，并输出 `Remote caching disabled`；`turbo.json` 中设置了 `remoteCache.enabled: false`。
   - **AC4**：所有 `package.json` 中都没有 `^` 或 `~`。05 §4.1 补登记了 `@vitest/coverage-v8`、`@types/node`。
   - **AC5**：`pnpm knip` 无报告。另做了反向验证：临时加一个未使用的导出，knip 能检出。
@@ -151,4 +152,5 @@ CI 工作流（P0-CI-01）、git 钩子（P0-REPO-03）、Docker（P0-REPO-05）
   - R2：在本机，另一份没有执行 `mise trust` 的克隆也能直接 `mise install` 并加载 `[env]`，可能与本机已有的信任状态有关；新机器上的行为未验证，所以仍保留 `mise trust` 这一步。
   - R3：pnpm 12 接受 `strictPeerDependencies`，安装时没有告警。
 - **本机环境变化**：用 `brew install mise` 安装了 mise。node 26.13.1、pnpm 12.23.0、gitleaks、gh 由 mise 安装在它自己的目录中；没有改 shell 配置。
+- **文档同步补充**：P0-REPO-02 交付物中的 `apps/admin/AGENTS.md` 改为 `apps/admin-web/AGENTS.md`（按 Q2）。
 - **下一步**：P0-CI-01（CI 应使用 `pnpm install --frozen-lockfile`，并检查 `.nvmrc` 与 `.mise.toml` 一致）；P0-REPO-05 可以并行。

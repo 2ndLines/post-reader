@@ -13,7 +13,7 @@
 - `docs/progress/STATUS.md`、`HANDOFF.md`
 
 ## 交付物
-- `apps/ios/AGENTS.md`、`apps/server/AGENTS.md`、`apps/admin/AGENTS.md`、`apps/testbench/AGENTS.md`、`apps/edge/AGENTS.md` 初稿：各端命令、目录约定、该端红线与受保护路径（摘自架构 01–04、02 §22.1 与 playbook §8、§9.4），每份不超过 60 行
+- `apps/ios/AGENTS.md`、`apps/server/AGENTS.md`、`apps/admin-web/AGENTS.md`、`apps/testbench/AGENTS.md`、`apps/edge/AGENTS.md` 初稿：各端命令、目录约定、该端红线与受保护路径（摘自架构 01–04、02 §22.1 与 playbook §8、§9.4），每份不超过 60 行
 - 根 `AGENTS.md` 的「命令」一节与 P0-REPO-01 实际脚本对齐：尚不存在的命令标注所属阶段，不写成可用
 - 核对 `docs/` 内相对路径链接全部可达（脚本检查，入 `pnpm verify` 或 CI）
 
