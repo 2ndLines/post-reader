@@ -30,7 +30,7 @@ CI 工作流（P0-CI-01）、git 钩子（P0-REPO-03）、Docker（P0-REPO-05）
 
 ## 上下文摘要（助手填写）
 
-填写于 2026-11-26，状态：计划待负责人确认，未动手。
+填写于 2026-11-26。负责人已于同日确认计划（Q1–Q7 均按默认）。
 
 - **需求**：本卡只建「空而可校验」的 TS monorepo 骨架。`pnpm verify`（Biome + 类型检查 + 单元测试）在干净克隆中一次通过；类型错误能让它失败；turbo 只用本地缓存；依赖版本精确固定并登记；knip 无报告。不写业务代码，不做 CI、git 钩子、Docker。
 - **依据要点**：
@@ -127,3 +127,28 @@ CI 工作流（P0-CI-01）、git 钩子（P0-REPO-03）、Docker（P0-REPO-05）
 **故意不做的事**：`tsx` 和 `lefthook` 虽然登记在 P0，但分别要等后续任务卡（脚本、P0-REPO-03）才会用到。现在安装会让 knip 报未使用依赖，所以本卡不装。
 
 ## 交接记录（会话结束时填写）
+
+**2026-11-26 · 实现完成，待 PR 审阅**
+
+- **负责人决定**：
+  - Q1–Q7 全部按默认执行。
+  - 关于 node 25，负责人的原话是「用 node 25 也一样」。基线仍保持 26：05 §1.1 与 D9 定的是 26，而 node 25 已于 2026-06-01 停止维护（EOL）。
+  - 另外实测：用全局 node 25 运行 `pnpm verify`，同样通过。
+- **验收证据**（在干净克隆中运行）：
+  - **AC1**：`mise trust && mise install && pnpm i --frozen-lockfile && pnpm verify` 退出码 0。node 为 v26.13.1，pnpm 为 12.23.0；3 个任务全部成功。
+  - **AC2**：在 `sum.ts` 中写入类型错误后，`pnpm verify` 退出码 1，报错为 `error TS2322: Type 'string' is not assignable to type 'number'`，失败任务是 `@post-reader/tooling#typecheck`。还原后退出码 0。
+  - **AC3**：连续运行两次 `turbo run verify`，第二次显示 `Cached: 3 cached, 3 total`、`FULL TURBO`，并输出 `Remote caching disabled`；`turbo.json` 中设置了 `remoteCache.enabled: false`。
+  - **AC4**：所有 `package.json` 中都没有 `^` 或 `~`。05 §4.1 补登记了 `@vitest/coverage-v8`、`@types/node`。
+  - **AC5**：`pnpm knip` 无报告。另做了反向验证：临时加一个未使用的导出，knip 能检出。
+  - **其他**：gitleaks 扫描通过。
+- **与计划的偏差**：
+  - **Biome 2.6 默认会格式化 Markdown。** 如果不关，它会改写全部设计文档的表格排版，所以设置了 `markdown.formatter.enabled: false`。另外，Biome 已弃用 `rules.recommended`，改用 `rules.preset: "recommended"`。
+  - **依赖放置。** `typescript`、`vitest`、`@vitest/coverage-v8`、`@types/node` 放在使用它们的包里（`packages/tooling`）。根目录只放 turbo、Biome、knip。05 §4.1 中两行的「位置」相应改为「各包」。
+  - **knip 根工作区。** 设为 `project: []`：根目录没有源码，其下的子目录要么是 workspace，要么是文档。依赖检查不受影响。
+  - **`allowBuilds`。** 初始为空，因为本次安装没有遇到需要构建的依赖。
+- **风险结论**：
+  - R1：TS 7.0.2 可用，`tsc --noEmit`、vitest、knip 都正常。
+  - R2：在本机，另一份没有执行 `mise trust` 的克隆也能直接 `mise install` 并加载 `[env]`，可能与本机已有的信任状态有关；新机器上的行为未验证，所以仍保留 `mise trust` 这一步。
+  - R3：pnpm 12 接受 `strictPeerDependencies`，安装时没有告警。
+- **本机环境变化**：用 `brew install mise` 安装了 mise。node 26.13.1、pnpm 12.23.0、gitleaks、gh 由 mise 安装在它自己的目录中；没有改 shell 配置。
+- **下一步**：P0-CI-01（CI 应使用 `pnpm install --frozen-lockfile`，并检查 `.nvmrc` 与 `.mise.toml` 一致）；P0-REPO-05 可以并行。
