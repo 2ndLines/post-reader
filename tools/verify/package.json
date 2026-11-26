@@ -1,0 +1,31 @@
+{
+  "name": "@post-reader/verify",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "P0-REPO-05 验证项 V1、V4 的探测脚本（独立项目，不属于主工作区）",
+  "packageManager": "pnpm@12.23.0",
+  "engines": {
+    "node": ">=26 <27"
+  },
+  "scripts": {
+    "v1": "node src/v1.ts",
+    "v4": "node src/v4.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1175.0",
+    "@aws-sdk/s3-request-presigner": "3.1175.0",
+    "bullmq": "6.7.8",
+    "drizzle-kit": "0.31.11",
+    "drizzle-orm": "0.45.4",
+    "ioredis": "6.1.0",
+    "postgres": "4.1.1",
+    "promptfoo": "0.126.0",
+    "testcontainers": "12.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2"
+  }
+}

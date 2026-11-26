@@ -17,6 +17,8 @@ concurrency:
 env:
   DO_NOT_TRACK: "1"
   TURBO_TELEMETRY_DISABLED: "1"
+  PROMPTFOO_DISABLE_TELEMETRY: "1"
+  PULUMI_SKIP_UPDATE_CHECK: "true"
   # CI 中不安装本地 git 钩子（prepare 脚本里的 lefthook install）
   LEFTHOOK: "0"
   # 与 .mise.toml 保持一致，由 pnpm check:versions 校验

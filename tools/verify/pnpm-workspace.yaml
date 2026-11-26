@@ -1,0 +1,20 @@
+# 独立项目：与根目录 pnpm-workspace.yaml 相同的供应链设置（05 §2.5）
+packages: []
+
+# 全部显式禁止：均为可选的原生加速或安装后自检，V1 实测不需要（见 ADR 0017）
+allowBuilds:
+  cpu-features: false
+  esbuild: false
+  msgpackr-extract: false
+  protobufjs: false
+  ssh2: false
+
+minimumReleaseAge: 4320
+
+strictPeerDependencies: true
+
+# promptfoo 的间接依赖存在两处 peer 版本冲突（V1 发现，见 ADR 0017）。只对这两对放行，不关闭严格模式。
+peerDependencyRules:
+  allowedVersions:
+    nunjucks>chokidar: "6"
+    mongodb>gcp-metadata: "9"

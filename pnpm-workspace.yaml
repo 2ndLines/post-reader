@@ -3,6 +3,8 @@ packages:
   - apps/testbench/*
   - packages/*
   - tools/*
+  # 验证脚本是独立项目（自带锁文件与同样的安全设置），不进入主工作区的依赖、许可证与 knip 范围
+  - "!tools/verify"
 
 # 只允许列出的依赖运行安装脚本（pnpm 11 起取代 onlyBuiltDependencies）；新增需在 PR 中说明原因
 allowBuilds:

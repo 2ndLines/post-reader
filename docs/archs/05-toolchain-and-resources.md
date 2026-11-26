@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.4（2026-11-26） |
+| 文档版本 | v1.5（2026-11-26） |
 | v1.1 变更 | Xcode 27 构建基线；新增 VisionKit；说明 iOS 27 SDK 忽略 `UIDesignRequiresCompatibility`、快照覆盖 iOS 18 与 iOS 27 的原因；依据改为主 PRD v2.7 草案 |
 | v1.2 变更 | 新增 §3.8 Cloudflare 边缘与存储、§11 长远方案登记（Hono、Wrangler、AudioSeal、C2PA 等）；国内 Redis 改为开源版 7.0，海外对象存储改为 R2 |
+| v1.5 变更 | P0-REPO-05：§1.2 V1、V4、V5 已验证（ADR 0017、0018）；§5.1 pulumi 提前固定 |
 | v1.4 变更 | P0-CI-01：§5.3 `ci` 步骤与 gitleaks 改用 CLI；§2.2 许可证清单位置 |
 | v1.3 变更 | P0-REPO-01 落地后回写：npm 依赖一律写精确版本（§2.4）；pnpm 11 起以 `allowBuilds` 取代 `onlyBuiltDependencies`（§2.5、附录 B）；遥测变量改由 `.mise.toml [env]` 设置（§2.6）；§4.1 补登记 `@vitest/coverage-v8`、`@types/node`，`typescript`、`vitest` 位置改为各包；Biome 不格式化 Markdown；管理后台目录统一为 `apps/admin-web` |
 | 依据 | 主 PRD v2.7 草案；架构文档 00–04；`ai-dev-playbook.md` |
@@ -68,10 +69,13 @@ P0–P12 与 `ai-dev-playbook.md` 第 6 节一致：P0 工程基座 · P1 契约
 | 编号 | 验证内容 | 引入阶段 | 不通过时的回退 |
 | --- | --- | --- | --- |
 | V1 | Node 26 下 BullMQ、Testcontainers、drizzle-kit、promptfoo、Pulumi 全部可用（Node 26 移除了部分旧 API） | P0 | 回退 Node 24，写 ADR |
+| | **已验证（2026-11-26）**：5 项全部通过，维持 Node 26；实现约束见 ADR 0017 | | |
 | V2 | GRDB + SQLCipher 的 SPM 集成方式（Share Extension 与主 App 共用） | P4 首个任务 | 换用 SQLCipher 官方 SPM 包 + GRDB 的自定义构建方式；仍不行则停下报告 |
 | V3 | `@asteasolutions/zod-to-openapi` 与所用 zod 主版本兼容，生成结果能被 swift-openapi-generator 消费 | P1 | 改用 zod 自带的 JSON Schema 导出加自写 OpenAPI 组装脚本 |
 | V4 | 本地 S3 替身（SeaweedFS）的预签名 URL、分段上传、`DeleteObjects` 与 AWS S3 / OSS 行为一致 | P0 | 换另一种 S3 替身；集成测试中对象存储相关用例在预发补测 |
+| | **已验证（2026-11-26）**：15 项与 S3 一致，维持 SeaweedFS；差异表（含 OSS 分段下限 100 KB）与预签名 PUT 的 SDK 校验和陷阱见 ADR 0017 | | |
 | V5 | 两区 KMS 是否都支持 Ed25519 非对称签名（配置包签名） | P0 | 不支持的区改用 ECDSA P-256 签名，客户端同时接受两种算法 |
+| | **已验证（文档，2026-11-26）**：AWS KMS 支持，阿里云 KMS 不支持 → 国内区 ECDSA P-256，见 ADR 0018；只读 API 复核待负责人 | | |
 | V6 | 阿里云 Redis 开源版 7.0 上 BullMQ 与 Streams 的冒烟测试（D6 已定实例类型，此项只做确认） | P10 | 阻断国内区上线，向阿里云提工单 |
 | V7 | Refine 与 antd 当前大版本组合的兼容性 | P9 | 固定在已验证组合 |
 
@@ -431,7 +435,7 @@ iOS 依赖的额外规则：
 | node、pnpm | TS 工具链 | P0 |
 | gitleaks | 密钥扫描 | P0 |
 | gh | GitHub CLI（提 PR、看 CI） | P0 |
-| pulumi | 基础设施 | P3 |
+| pulumi | 基础设施 | P3（CLI 于 P0-REPO-05 为 V1 验证提前固定在 `.mise.toml`） |
 | xcodegen、swiftlint、swiftformat | iOS 工具 | P4 |
 | k6 | 压测 | P11 |
 | ffmpeg | 本地响度测量与台架开发 | P3 |
