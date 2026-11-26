@@ -67,7 +67,8 @@ jobs:
             "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${archive}"
           echo "${GITLEAKS_SHA256_LINUX_X64}  $RUNNER_TEMP/$archive" | sha256sum --check --strict
           tar -xzf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP" gitleaks
-          "$RUNNER_TEMP/gitleaks" git . --redact --no-banner --exit-code 1
+          # 只扫描被测提交可达的完整历史；默认的 --all 会把其他分支（例如别的 PR）的问题算到本次运行上
+          "$RUNNER_TEMP/gitleaks" git . --redact --no-banner --exit-code 1 --log-opts=HEAD
 
       - name: 许可证
         run: pnpm check:licenses
