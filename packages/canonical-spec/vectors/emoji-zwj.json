@@ -1,0 +1,74 @@
+[
+  {
+    "name": "family-emoji-kept",
+    "raw": "我家 👨\u200d👩\u200d👧 去了",
+    "unitId": "c_emoji-zwj_1",
+    "authorId": "u_1",
+    "expectedClean": "我家 👨\u200d👩\u200d👧 去了",
+    "expectedHash": "55ef140e47798ae26b3907c08c28bc2711c1f6fe36fe302389b3140dd940981a",
+    "note": "emoji 之间的 ZWJ 保留"
+  },
+  {
+    "name": "rainbow-flag-vs16-kept",
+    "raw": "🏳\ufe0f\u200d🌈",
+    "unitId": "c_emoji-zwj_2",
+    "authorId": "u_2",
+    "expectedClean": "🏳\ufe0f\u200d🌈",
+    "expectedHash": "21d882ac341194e6d981c740e34e087c674ac2fc2ec5070a210f87b33e081096",
+    "note": "向前跳过 VS16 再判定"
+  },
+  {
+    "name": "skin-tone-profession-kept",
+    "raw": "👩🏽\u200d💻 写代码",
+    "unitId": "c_emoji-zwj_3",
+    "authorId": "u_3",
+    "expectedClean": "👩🏽\u200d💻 写代码",
+    "expectedHash": "71c411acf8c6c0df55a4fc4ac51b241f6081fff7c2a5057f5e8f977e3647e4fb",
+    "note": "肤色修饰符具有 Emoji 属性"
+  },
+  {
+    "name": "zwj-between-latin-removed",
+    "raw": "a\u200db",
+    "unitId": "c_emoji-zwj_4",
+    "authorId": "u_4",
+    "expectedClean": "ab",
+    "expectedHash": "b2b7b14fd1ba2569d7891ec6d25d56636d0e5dc23612139a072d981007f6584c",
+    "note": "拉丁字母之间的 ZWJ 删除"
+  },
+  {
+    "name": "zwj-emoji-then-text-removed",
+    "raw": "😀\u200dabc",
+    "unitId": "c_emoji-zwj_5",
+    "authorId": "u_5",
+    "expectedClean": "😀abc",
+    "expectedHash": "84ec2bf98e181a816e9da09b9d4bf363ae3b39dc78559e859622251236c25005",
+    "note": "后一个码位不是 emoji"
+  },
+  {
+    "name": "zwj-ascii-digits-removed",
+    "raw": "1\u200d2",
+    "unitId": "c_emoji-zwj_6",
+    "authorId": "u_6",
+    "expectedClean": "12",
+    "expectedHash": "bc1ddc6b441c3140238920d357b0ad6aea38d9bf1f557a5e9b9fc4a9f482aa3c",
+    "note": "ASCII 数字虽有 Emoji 属性，但被排除"
+  },
+  {
+    "name": "keycap-sequence-kept",
+    "raw": "#\ufe0f⃣ 第一",
+    "unitId": "c_emoji-zwj_7",
+    "authorId": "u_7",
+    "expectedClean": "#\ufe0f⃣ 第一",
+    "expectedHash": "9e31a6feec0e55004be3fedc058422468d083c888c54e8ecc540d221eaa2070b",
+    "note": "键帽序列不含 ZWJ，原样保留"
+  },
+  {
+    "name": "zwnj-between-emoji-removed",
+    "raw": "😀\u200c😀",
+    "unitId": "c_emoji-zwj_8",
+    "authorId": "u_8",
+    "expectedClean": "😀😀",
+    "expectedHash": "88949c14154b0c3349234e379a6e98e44ff2e560ef24fc63a89487e2bd44670b",
+    "note": "ZWNJ 不因 emoji 上下文保留"
+  }
+]

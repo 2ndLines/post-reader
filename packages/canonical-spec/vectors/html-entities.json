@@ -1,0 +1,83 @@
+[
+  {
+    "name": "named-basic",
+    "raw": "a &amp; b &lt;c&gt; &quot;d&quot; &apos;e&apos;",
+    "unitId": "c_html-entities_1",
+    "authorId": "u_1",
+    "expectedClean": "a & b <c> \"d\" 'e'",
+    "expectedHash": "c8d16722f5e723d1ad1081262c4fc33928e203ebe543de04c067520eea0b7987",
+    "note": "五个基本命名实体；不做 SSML 转义"
+  },
+  {
+    "name": "numeric-decimal-and-hex",
+    "raw": "&#20320;&#x597D;&#X4E16;",
+    "unitId": "c_html-entities_2",
+    "authorId": "u_2",
+    "expectedClean": "你好世",
+    "expectedHash": "a19dbc8e8309d3c1648ab40fcae00ce8a02df8a83695541c1ac9c89646a45746",
+    "note": "十进制与十六进制数字实体"
+  },
+  {
+    "name": "double-encoded-decoded-once",
+    "raw": "&amp;lt;",
+    "unitId": "c_html-entities_3",
+    "authorId": "u_3",
+    "expectedClean": "&lt;",
+    "expectedHash": "b82cb7775037f5c0f020864d8f6b866771de1a8a0b03b513124386922aaa2f27",
+    "note": "只解码一遍"
+  },
+  {
+    "name": "unknown-or-malformed-kept",
+    "raw": "&copy; &AMP; &amp",
+    "unitId": "c_html-entities_4",
+    "authorId": "u_4",
+    "expectedClean": "&copy; &AMP; &amp",
+    "expectedHash": "c80f30f2aba4d5504732f7d6f1ad62ff4d8066e4e50304faa3b1c80c45fa88ca",
+    "note": "未知命名、大小写不符、缺少分号的都原样保留"
+  },
+  {
+    "name": "nbsp-entity-trimmed-at-ends",
+    "raw": "&nbsp;x&nbsp;y&nbsp;",
+    "unitId": "c_html-entities_5",
+    "authorId": "u_5",
+    "expectedClean": "x\u00a0y",
+    "expectedHash": "8472f995a53058b304fb096cb7603575da0e554d1c420cadb9c1bac3cc6316bd",
+    "note": "&nbsp; → U+00A0；首尾去除，行内保留"
+  },
+  {
+    "name": "invalid-codepoints-replaced",
+    "raw": "&#0;&#xD800;&#x110000;",
+    "unitId": "c_html-entities_6",
+    "authorId": "u_6",
+    "expectedClean": "\ufffd\ufffd\ufffd",
+    "expectedHash": "f6c73d9b5588cfe209944fba1f44045389e4ea5ac142031df660f1e1dd8f1162",
+    "note": "0、代理区、超出 U+10FFFF 的码点都替换为 U+FFFD"
+  },
+  {
+    "name": "entity-zwsp-then-removed",
+    "raw": "a&#8203;b",
+    "unitId": "c_html-entities_7",
+    "authorId": "u_7",
+    "expectedClean": "ab",
+    "expectedHash": "4080ed166ac6e27af6aaf5e23cb89ff7ce9ad648e38b3e16ea46afbb5b3dc887",
+    "note": "实体解码出的 U+200B 在第 3 步删除"
+  },
+  {
+    "name": "too-many-digits-kept",
+    "raw": "&#12345678;",
+    "unitId": "c_html-entities_8",
+    "authorId": "u_8",
+    "expectedClean": "&#12345678;",
+    "expectedHash": "31126ccf5703eef0e34268bee17ce7d85b415c91137b4482cb5e9decbd7cd389",
+    "note": "十进制超过 7 位，不算实体"
+  },
+  {
+    "name": "entity-crlf-unified",
+    "raw": "a&#13;&#10;b",
+    "unitId": "c_html-entities_9",
+    "authorId": "u_9",
+    "expectedClean": "a\nb",
+    "expectedHash": "70cc247a75684d2e20debef913df350408c13188961221d49a9a433d54b24536",
+    "note": "实体解码出的 CRLF 统一为 LF"
+  }
+]

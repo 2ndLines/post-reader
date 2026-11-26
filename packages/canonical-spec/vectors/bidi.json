@@ -1,0 +1,74 @@
+[
+  {
+    "name": "arabic-plain",
+    "raw": "مرحبا بالعالم",
+    "unitId": "c_bidi_1",
+    "authorId": "u_1",
+    "expectedClean": "مرحبا بالعالم",
+    "expectedHash": "6d19d9906ab3853e185b645cca2ac8963e29142a021793d66e4697decb9ef724",
+    "note": "无需改动"
+  },
+  {
+    "name": "rlo-override-removed",
+    "raw": "abc\u202edef",
+    "unitId": "c_bidi_2",
+    "authorId": "u_2",
+    "expectedClean": "abcdef",
+    "expectedHash": "df8bdb4b2606d743e6e912ab1698031ba2290a443468c9fdb5df74d076487461",
+    "note": "U+202E 删除"
+  },
+  {
+    "name": "isolates-removed",
+    "raw": "\u2067שלום\u2069 world",
+    "unitId": "c_bidi_3",
+    "authorId": "u_3",
+    "expectedClean": "שלום world",
+    "expectedHash": "b33d8004b70edc2fd52613834c284ea6dc8241d1daab32cab81b8d4a2de88c6d",
+    "note": "U+2067、U+2069 删除"
+  },
+  {
+    "name": "lrm-rlm-kept",
+    "raw": "a\u200fb\u200ec",
+    "unitId": "c_bidi_4",
+    "authorId": "u_4",
+    "expectedClean": "a\u200fb\u200ec",
+    "expectedHash": "c93ce35d98e0ab6ff8ee0c17761b3cbc8b78e2e132d59c8acc051fdea8129f1a",
+    "note": "LRM、RLM 不在删除列表中"
+  },
+  {
+    "name": "persian-zwnj-kept",
+    "raw": "می\u200cخواهم",
+    "unitId": "c_bidi_5",
+    "authorId": "u_5",
+    "expectedClean": "می\u200cخواهم",
+    "expectedHash": "f9b53c533c519dc84b82be279d67eed6666248f20aab6dcfaa31c13a5b35d22b",
+    "note": "阿拉伯文区段之间的 ZWNJ 保留"
+  },
+  {
+    "name": "arabic-zwj-kept",
+    "raw": "ل\u200dا",
+    "unitId": "c_bidi_6",
+    "authorId": "u_6",
+    "expectedClean": "ل\u200dا",
+    "expectedHash": "497febba93514a4d8ea2d37ce654d631b5b01a72312aaf8fe30b60b76536d3a0",
+    "note": "阿拉伯文区段之间的 ZWJ 保留"
+  },
+  {
+    "name": "devanagari-zwj-kept",
+    "raw": "क्\u200dष",
+    "unitId": "c_bidi_7",
+    "authorId": "u_7",
+    "expectedClean": "क्\u200dष",
+    "expectedHash": "41b52647170c6316d6c41f4c8b7b0503098d8ba6d232b848f6b7e3a4aceb1087",
+    "note": "天城文半体连写的 ZWJ 保留"
+  },
+  {
+    "name": "lre-pdf-removed",
+    "raw": "x\u202ay\u202cz",
+    "unitId": "c_bidi_8",
+    "authorId": "u_8",
+    "expectedClean": "xyz",
+    "expectedHash": "9f80559dafda6d5230ac0f26a38c91c8ed7a432d8cb7de4204b16f6acb84741f",
+    "note": "U+202A、U+202C 删除"
+  }
+]
