@@ -24,7 +24,7 @@ P0 工程基座 · P0-REPO-01 已实现（PR 待审阅）；合规确认与供�
 - P0-REPO-03 PR 待审阅（叠在 #2 上）；AC2 需规则集开启「必须 Code Owner 审阅」
 - P0-REPO-02 PR 待审阅（叠在 P0-REPO-03 上）；AC3 需负责人审阅各端 AGENTS.md
 - P0-REPO-05 PR 待审阅（叠在 P0-REPO-02 上）
-- P0-REPO-04 PR 待审阅（叠在 REPO-05 上）
+- P0-REPO-04 PR 待审阅（叠在 #7 上）
 
 ## 阻塞
 - 国内备案与登记需基于选定的国内模型与语音厂商（供应商未定）
@@ -33,7 +33,7 @@ P0 工程基座 · P0-REPO-01 已实现（PR 待审阅）；合规确认与供�
 ## 负责人待办（按顺序）
 1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → #7 REPO-05 → REPO-04（本 PR）
 2. 决定助手推送与提 PR 的身份（机器用户或 GitHub App），然后开启 `main` 规则集（docs/progress/github-settings.md）
-3. 补做需要你操作的验收：CI-01 AC4（向 `main` 直推被拒）、REPO-03 AC2（Code Owner 自动请求审阅）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5（两区 KMS 只读 API 复核，命令见 ADR 0018）、REPO-04 AC4（在新会话中执行 `/start-task P0-REPO-05`）
+3. 补做需要你操作的验收：CI-01 AC4（向 `main` 直推被拒）、REPO-03 AC2（Code Owner 自动请求审阅）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5（两区 KMS 只读 API 复核，命令见 ADR 0018）
 4. 创建只读的 fine-grained PAT，并在本机设置 `GITHUB_MCP_TOKEN`（`.mcp.json` 中的 github MCP 用）
 5. 批准或修改 ADR 0017、0018
 6. P3 引入 promptfoo 前：决定其依赖树中 BlueOak、PSF、LGPL（libvips）等许可证的处理（ADR 0017 约束 6）

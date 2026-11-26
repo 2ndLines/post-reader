@@ -40,7 +40,7 @@
   - hook 中可以使用 `$CLAUDE_PROJECT_DIR`。
   - `Bash(x *)` 与 `Bash(x:*)` 等价；规则求值顺序为 deny → ask → allow。
   - skill 用 `disable-model-invocation` 禁止自动调用；子代理用 `tools` 字段限定工具。
-- **关键事实**：`permissions` 与 `hooks` 的改动会热加载，对本会话立即生效；新增的 skills 要到新会话才可调用。
+- **关键事实**：`permissions` 与 `hooks` 的改动会热加载，对本会话立即生效。新增的 skills 也会加载，但有延迟：刚写入时调用返回 `Unknown skill`，几分钟后出现在可用列表中。
 - **仓库原状**：没有 `.claude/`，也没有 `.mcp.json`。本机有 `/usr/bin/jq`。
 
 ## 计划（助手填写）
@@ -62,13 +62,13 @@
 
 - **R1 写入配置会改变本会话自身的权限**：allow 规则只按 05 §6.8 与附录 E 的范围写，没有额外扩大；deny 与 ask 规则也在本会话中立即生效（例如 `rm -rf` 被拒）。请负责人审阅 `.claude/settings.json`（受保护路径）。
 - **R2 护栏只拦截文件工具**：`guard-paths.sh` 不拦截 shell 命令，`settings.json` 本身就是经 Bash 里的 Biome 格式化的。对受保护文件的强制约束来自 CODEOWNERS 加规则集，见 05 §6.6 实现约束第 4 条。
-- **R3 AC4 与 Stop hook 需要新会话验证**：skills 要到新会话才可调用，所以 AC4 需要负责人在新会话中执行 `/start-task P0-REPO-05`。Stop hook 的逻辑由单元测试覆盖。
+- **R3 Stop hook 在真实会话中的运行**：逻辑由单元测试覆盖，本会话结束时会实际运行一次。AC4 已在本会话完成，见交接记录。
 - **R4 只读 PAT**：`.mcp.json` 依赖负责人创建 fine-grained 只读 PAT，并在本机设置 `GITHUB_MCP_TOKEN`。
 - **R5 前几张卡的分支名**：P0-REPO-01 至 P0-REPO-05 的分支没有按 `feat/<编号>` 约定命名，但都已推送并挂在 PR 上，改名会破坏 PR，所以保持原样。从本卡起按约定命名。
 
 ## 交接记录（会话结束时填写）
 
-**2026-11-26 · AC1、AC2、AC3（格式化部分）、AC5 已完成；AC4 与 Stop hook 的实际运行待负责人在新会话中验证**
+**2026-11-26 · AC1–AC5 已完成**
 
 - **AC1**（本会话实测）：用 Read 读取 `.env` 被拒，返回 `File is in a directory that is denied by your permission settings.`
 - **AC2**（本会话实测）：
@@ -79,7 +79,7 @@
   - **自动格式化**（本会话实测）：编辑 TS 测试文件后，harness 提示 `PostToolUse hook modified … (likely a formatter)`。
   - **受保护路径记录**（本会话实测）：`note-protected` 把前面那次探测写入记录到了 `.claude/state/protected-touched.txt`。
   - **会话结束时的 verify-on-stop**：逻辑由单元测试覆盖（`stop_hook_active` 时放行、没有改动时跳过、检查通过时放行、检查失败时以退出码 2 阻止结束）。
-- **AC4（未完成）**：本会话调用 `start-task` 返回 `Unknown skill`，因为 skills 不热加载。需要负责人在新会话中执行 `/start-task P0-REPO-05`。
+- **AC4**（本会话实测）：刚写入 skills 时调用 `start-task` 返回 `Unknown skill`。几分钟后可用列表中出现了 16 个 skill：`phase-review` 与 `release-checklist` 设置了 `disable-model-invocation`，所以正确地没有出现。此后执行 `/start-task P0-REPO-05` 返回 `Launching skill: start-task`，并带上参数 `ARGUMENTS: P0-REPO-05`，然后按步骤 1 读出验收标准、已填写的上下文摘要与计划，以及任务索引中的状态。该卡三节都已填写，所以没有改写它。
 - **AC5**：`claude-hooks.test.ts` 共 41 个用例，覆盖四个脚本的允许与拒绝两类输入，以及以下边界：`..`、项目外路径、NotebookEdit、无法解析的输入、缺少 jq、缺少 lib.sh、UTF-8 与 C 两种 locale。
 - **额外核对**：权限规则也是实时生效的，`rm -rf <不存在的路径>` 被拒绝。
 - **根目录检查**：`pnpm verify`、`knip` 与全部 `check:*` 都通过。

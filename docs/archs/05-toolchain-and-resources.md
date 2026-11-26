@@ -615,7 +615,7 @@ iOS 依赖的额外规则：
 2. **脚本里的变量一律写成 `${name}`**：在 zh_CN.UTF-8 下，bash 会把紧跟在变量名后面的中文标点当作变量名的一部分（例如 `$rel。`）。在 `set -u` 下这会让脚本以退出码 1 结束，导致护栏失效。测试默认在 UTF-8 locale 下运行。
 3. **依赖 jq**：macOS 自带 `/usr/bin/jq`，GitHub 的 Ubuntu 运行器也有。缺少 jq 时，`guard-paths.sh` 拒绝写入，其余 hook 跳过。
 4. **护栏只拦截文件工具**（Edit、Write、MultiEdit、NotebookEdit），不拦截 shell 命令。对受保护文件的强制约束来自 CODEOWNERS 加规则集（P0-CI-01、P0-REPO-03）。
-5. **生效时机**：`permissions` 与 `hooks` 的改动会热加载，对正在运行的会话立即生效；新增的 skills 要到新会话才可调用。
+5. **生效时机**：`permissions` 与 `hooks` 的改动会热加载，对正在运行的会话立即生效；新增的 skills 会在几分钟内加载，在此之前调用返回 `Unknown skill`。
 6. **测试**：hook 脚本的单元测试在 `tools/ci-checks/src/claude-hooks.test.ts`，以 JSON 作为 stdin 调用脚本，覆盖允许与拒绝两类输入。
 
 ### 6.7 子代理

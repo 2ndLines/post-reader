@@ -30,7 +30,19 @@ function basePath(extra = ''): string {
  * 默认在 UTF-8 中文 locale 下运行：负责人本机即为 zh_CN.UTF-8。曾出现 `$rel。` 在该 locale 下被 bash
  * 当作变量名 `rel。`、在 set -u 下以退出码 1 结束（PreToolUse 视为非阻断，写入被放行）的缺陷，C locale 下测不出来。
  */
-const UTF8_LOCALE = { LANG: 'zh_CN.UTF-8', LC_ALL: 'zh_CN.UTF-8' };
+const UTF8_LOCALE = (() => {
+  // macOS 的 bash 在任何 UTF-8 locale 下都能复现该缺陷；按本机实际安装的 locale 选一个（CI 的 Ubuntu 没有 zh_CN.UTF-8）。
+  // 注意：Ubuntu 的 bash 在 C.UTF-8 下不复现，所以这条回归测试只在 macOS（负责人本机与助手会话）上真正起作用。
+  const normalize = (name: string) => name.toLowerCase().replace(/-/g, '');
+  const installed = new Set(
+    spawnSync('locale', ['-a'], { encoding: 'utf8' }).stdout.split('\n').map(normalize),
+  );
+  const chosen = ['zh_CN.UTF-8', 'C.UTF-8', 'en_US.UTF-8'].find((name) =>
+    installed.has(normalize(name)),
+  );
+  if (!chosen) throw new Error('本机没有可用的 UTF-8 locale，无法运行 hooks 测试');
+  return { LANG: chosen, LC_ALL: chosen };
+})();
 
 function runHook(
   script: string,
