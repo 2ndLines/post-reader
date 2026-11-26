@@ -18,4 +18,6 @@ pre-commit:
 pre-push:
   jobs:
     - name: verify
+      # verify 检查整个仓库；显式给出文件列表，避免首次推送新分支时 lefthook 因「无推送文件」而跳过
+      files: git ls-files
       run: mise exec -- pnpm verify

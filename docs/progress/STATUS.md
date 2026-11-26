@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-26（P0-CI-01 实现完成，PR 待审阅）
+最后更新：2026-11-26（P0-REPO-03 实现完成，PR 待审阅）
 
 ## 当前阶段
 P0 工程基座 · P0-REPO-01 已实现（PR 待审阅）；合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P0-REPO-03：lefthook 提交前与推送前钩子、CODEOWNERS（覆盖 §9.4 全部 31 条并由 CI 校验）、PR 模板
 - P0-CI-01：`ci` 工作流（版本一致性、Action SHA、Biome、类型检查、测试、gitleaks、许可证、audit），AC1–AC3 有运行链接；`tools/ci-checks` 三项检查
 - P0-REPO-01：monorepo 骨架（pnpm 12 + turbo + Biome + TS 7 + vitest 5 + knip），mise 锁定工具链；干净克隆中 `pnpm verify` 通过；文档同步：00 v1.3、05 v1.3
 - 主 PRD v2.7 草案；iOS / 管理后台 / 测试台架 PRD v1.3；《业务闭环评审》第一至第四轮
@@ -17,7 +18,8 @@ P0 工程基座 · P0-REPO-01 已实现（PR 待审阅）；合规确认与供�
 ## 进行中
 - P0-REPO-01 PR 待负责人审阅（含受保护路径 `infra/README.md`、`packages/canonical-spec/README.md` 占位）
 - P0-CI-01 PR #2 待审阅（叠在 #1 上）；AC4 需负责人先决定助手推送身份并开启规则集（docs/progress/github-settings.md）
-- 其余 4 张 P0 任务卡：下一张 P0-REPO-03
+- P0-REPO-03 PR 待审阅（叠在 #2 上）；AC2 需规则集开启「必须 Code Owner 审阅」
+- 其余 3 张 P0 任务卡：下一张 P0-REPO-02
 
 ## 阻塞
 - 国内备案与登记需基于选定的国内模型与语音厂商（供应商未定）

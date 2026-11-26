@@ -322,7 +322,7 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 | `vitest` | 单元 / 集成测试 | 各包 | P0 | 已定 | 共享配置在 `packages/tooling`；`--coverage` 用 v8 |
 | `@vitest/coverage-v8` | vitest 的 v8 覆盖率提供方 | 各包 | P0 | 已定 | 版本必须与 `vitest` 完全相同；作为 `vitest` 的配套，不单独写 ADR |
 | `@types/node` | Node 类型定义 | 各包 | P0 | 已定 | 大版本与 Node 基线一致（26）；作为 `typescript` 的配套，不单独写 ADR |
-| `lefthook` | 本地 git 钩子 | 根 | P0 | 已定 | 提交前：Biome、gitleaks、变更包类型检查 |
+| `lefthook` | 本地 git 钩子 | 根 | P0 | 已定 | 提交前：Biome、gitleaks、变更包类型检查；推送前：`pnpm verify`；由根 `prepare` 安装，`postinstall` 在 `allowBuilds` 中禁止 |
 | `knip` | 未使用的文件、导出、依赖 | 根 | P0 | 已定 | CI 每周运行；报告进 Issue |
 | `tsx` | 运行 TS 脚本 | 根 | P0 | 已定 | 仅脚本与开发；生产镜像运行编译产物 |
 | `zod` | schema 唯一来源 | `packages/contracts`、`packages/config-schema` | P1 | 已定 | 前后端共用；schema 只在 `contracts` 定义 |
