@@ -83,10 +83,10 @@ Post&Comments Reader：用户把社交平台帖子链接分享、粘贴或扫码
 
 ## 7. 下一步
 
-1. **P0 工程基座**（不依赖任何待确认项）：按 `docs/archs/ai-dev-playbook.md` §6 建 monorepo、CI、依赖治理（05 §2）；先写 `packages/contracts`（含跳章与单篇上限的 WS 消息）、`packages/canonical-spec` 黄金向量、`packages/signed-url`（LT-01）。
+1. **P0 工程基座**（不依赖任何待确认项）：任务卡已在 `docs/tasks/`（6 张，顺序见其 README）。之后 P1 写 `packages/canonical-spec` 黄金向量与 `packages/contracts`（含跳章与单篇上限的 WS 消息）；`packages/signed-url` 属 LT-01。
 2. **风险原型**：iOS 切片下载 + 校验 + 无缝拼接与跳章；WebKit 站点登录凭证保持；AudioSeal 嵌入开销与 AAC / 边缘分发后的检出；真实厂商下的首段延迟。
 3. 每完成一项更新 `docs/progress/STATUS.md`；新决策写 ADR。
 
 ## 8. 新会话启动提示词
 
-> 先读 AGENTS.md、docs/progress/HANDOFF.md 与 docs/progress/STATUS.md。然后按 docs/archs/ai-dev-playbook.md 第 6 节，为 P0 生成任务卡（docs/tasks/），列出计划后等待我确认再开始。
+> 先读 AGENTS.md、docs/progress/HANDOFF.md、docs/progress/STATUS.md 与 docs/tasks/README.md。从 P0-REPO-01 开始：按任务卡填写上下文摘要与计划，等我确认后再动手。

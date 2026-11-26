@@ -13,7 +13,7 @@ P0 之前 · 设计基线已完成，等待合规确认与供应商选型；P0 �
 - 规格补全：计费时区、单篇上限、18+、可用性与恢复目标、首发店面
 
 ## 进行中
-- 无
+- P0 任务卡已写好（docs/tasks/，6 张），待负责人确认后开工
 
 ## 阻塞
 - 国内备案与登记需基于选定的国内模型与语音厂商（供应商未定）
@@ -26,5 +26,6 @@ P0 之前 · 设计基线已完成，等待合规确认与供应商选型；P0 �
 - [ ] D14：以上确认后，主 PRD v2.7 定稿
 
 ## 下一步建议
-1. P0 工程基座：monorepo、CI、依赖治理、`packages/contracts`（含跳章 WS 消息）、`canonical-spec` 黄金向量、`packages/signed-url`
-2. 风险原型：iOS 切片播放与跳章、WebKit 登录凭证、AudioSeal 水印开销、首段延迟（真实厂商）
+1. P0 工程基座：按 docs/tasks/README.md 的顺序执行 6 张任务卡
+2. P1 契约与规格：`canonical-spec` 黄金向量、`contracts`（含跳章 WS 消息）；`packages/signed-url` 属 LT-01（P2–P3）
+3. 风险原型：iOS 切片播放与跳章、WebKit 登录凭证、AudioSeal 水印开销、首段延迟（真实厂商），在 P1–P4 首个任务中安排
