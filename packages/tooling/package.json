@@ -1,0 +1,21 @@
+{
+  "name": "@post-reader/tooling",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "共享的 tsconfig 与 vitest 配置；example/ 为最小示例，用于验证工具链本身",
+  "exports": {
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./vitest": "./vitest.shared.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.1",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}

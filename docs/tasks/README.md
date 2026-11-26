@@ -8,7 +8,7 @@
 
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
-| [P0-REPO-01](P0-REPO-01.md) | Monorepo 骨架与工具链锁定 | — | — | 待开始 |
+| [P0-REPO-01](P0-REPO-01.md) | Monorepo 骨架与工具链锁定 | — | — | 计划待确认 |
 | [P0-REPO-02](P0-REPO-02.md) | 规则文件与文档导入收尾 | REPO-01 | 审阅各端 AGENTS.md | 部分完成 |
 | [P0-CI-01](P0-CI-01.md) | `ci` 工作流与分支保护 | REPO-01 | 在 GitHub 开启分支保护 | 待开始 |
 | [P0-REPO-03](P0-REPO-03.md) | 本地钩子、CODEOWNERS、PR 模板 | REPO-01、CI-01 | — | 待开始 |

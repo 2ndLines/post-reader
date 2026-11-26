@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.2（2026-11-26） |
+| 文档版本 | v1.3（2026-11-26） |
 | v1.1 变更 | Xcode 27 构建基线；新增 VisionKit；说明 iOS 27 SDK 忽略 `UIDesignRequiresCompatibility`、快照覆盖 iOS 18 与 iOS 27 的原因；依据改为主 PRD v2.7 草案 |
 | v1.2 变更 | 新增 §3.8 Cloudflare 边缘与存储、§11 长远方案登记（Hono、Wrangler、AudioSeal、C2PA 等）；国内 Redis 改为开源版 7.0，海外对象存储改为 R2 |
+| v1.3 变更 | P0-REPO-01 落地后回写：npm 依赖一律写精确版本（§2.4）；pnpm 11 起以 `allowBuilds` 取代 `onlyBuiltDependencies`（§2.5、附录 B）；遥测变量改由 `.mise.toml [env]` 设置（§2.6）；§4.1 补登记 `@vitest/coverage-v8`、`@types/node`，`typescript`、`vitest` 位置改为各包；Biome 不格式化 Markdown；管理后台目录统一为 `apps/admin-web` |
 | 依据 | 主 PRD v2.7 草案；架构文档 00–04；`ai-dev-playbook.md` |
 | 读者 | 负责人；执行开发的 AI 编程助手 |
 | 本文范围 | 从 P0 到 P12 要用到的服务器与云服务、三方库、开发工具与 CI 插件、AI 助手扩展（MCP、Skills、Hooks、子代理、插件），以及每一类的使用规范 |
@@ -52,8 +53,8 @@ P0–P12 与 `ai-dev-playbook.md` 第 6 节一致：P0 工程基座 · P1 契约
 | Redis 协议 | 只使用 Redis 7.0 社区版命令集（国内阿里云 Redis 开源版 7.0、海外 Valkey 都支持） | 代码约束 | 不使用 Valkey / Redis 8 独有命令与 Tair 专有命令（D6 已定） |
 | Xcode / Swift | **Xcode 27**（随附的 Swift 工具链，Swift 6 语言模式），固定到小版本 | `.xcode-version`、Xcode Cloud 工作流 | 开发机已安装 Xcode 27；App Store 自 2026-04-28 起要求至少 Xcode 26 / iOS 26 SDK，Xcode 27 满足 |
 | iOS 部署目标 | iOS 18（D8，不变） | `project.yml` | 用 iOS 27 SDK 构建不改变最低运行版本 |
-| React | 19 | `apps/admin`、`apps/testbench/web` | |
-| Ant Design | 跟随 `@refinedev/antd` 的 peer 范围 | `apps/admin/package.json` | antd 6 已发布；只有 Refine 的 peer 范围明确包含 6 时才升级，升级写 ADR |
+| React | 19 | `apps/admin-web`、`apps/testbench/web` | |
+| Ant Design | 跟随 `@refinedev/antd` 的 peer 范围 | `apps/admin-web/package.json` | antd 6 已发布；只有 Refine 的 peer 范围明确包含 6 时才升级，升级写 ADR |
 | Docker 基础镜像 | `node:26-bookworm-slim`，按 digest 固定 | Dockerfile | `server-audio` 在同一基础上安装发行版 ffmpeg |
 | Pulumi CLI | 固定到补丁版本 | `.mise.toml` | 与 `@pulumi/*` 包大版本一致 |
 
@@ -130,7 +131,7 @@ CI 每次运行 `pnpm licenses list --json` 并与允许列表比对；iOS 依�
 
 ### 2.4 版本锁定
 
-- npm：`pnpm-lock.yaml` 入库；`package.json` 中写精确版本或 `^`，以锁文件为准；CI 使用 `pnpm install --frozen-lockfile`。
+- npm：`pnpm-lock.yaml` 入库；`package.json` 中一律写精确版本（不带 `^`、`~`，用 `pnpm add -E`）；CI 使用 `pnpm install --frozen-lockfile`。
 - SPM：`Package.resolved` 入库；安全敏感依赖（GRDB、SQLCipher）用 `exact`，其余用 `upToNextMinor`。
 - Docker 镜像：一律按 digest 固定（`image@sha256:…`），由 Renovate 更新。
 - GitHub Actions：一律按完整 commit SHA 固定，注释中写对应版本号。
@@ -141,7 +142,7 @@ CI 每次运行 `pnpm licenses list --json` 并与允许列表比对；iOS 依�
 
 | 措施 | 实现 |
 | --- | --- |
-| 阻止安装脚本 | pnpm 默认不运行依赖的 install 脚本；`onlyBuiltDependencies` 只列确需构建的包（如 `esbuild`），新增需在 PR 中说明 |
+| 阻止安装脚本 | pnpm 默认不运行依赖的 install 脚本；`pnpm-workspace.yaml` 的 `allowBuilds` 只列确需构建的包（pnpm 11 起取代 `onlyBuiltDependencies`；P0 时为空），新增需在 PR 中说明 |
 | 新版本冷却期 | `minimumReleaseAge`（pnpm）与 Renovate `minimumReleaseAge` 均设 3 天，避开发布后被撤回或被投毒的版本 |
 | 密钥扫描 | gitleaks：lefthook 提交前扫描 + CI 全量扫描 |
 | 漏洞扫描 | CI 运行 `pnpm audit --prod`；镜像构建后生成 SBOM（syft）并扫描（grype）；高危漏洞阻塞合并 |
@@ -151,7 +152,7 @@ CI 每次运行 `pnpm licenses list --json` 并与允许列表比对；iOS 依�
 
 ### 2.6 遥测与数据外发
 
-本项目的红线是正文、URL、Cookie、邮箱不出本系统。所有工具默认关闭遥测，在 `.claude/settings.json` 的 `env`、CI 的全局 `env` 和 `.envrc` 中同时设置：
+本项目的红线是正文、URL、Cookie、邮箱不出本系统。所有工具默认关闭遥测，在 `.claude/settings.json` 的 `env`、CI 的全局 `env` 和 `.mise.toml` 的 `[env]`（本地 shell，代替 `.envrc`）中同时设置：
 
 | 变量 | 作用 |
 | --- | --- |
@@ -315,15 +316,17 @@ CI 每次运行 `pnpm licenses list --json` 并与允许列表比对；iOS 依�
 | 库 | 用途 | 位置 | 阶段 | 状态 | 使用规范 |
 | --- | --- | --- | --- | --- | --- |
 | `turbo` | 任务编排与缓存 | 根 | P0 | 已定 | 只用本地缓存；不开启远程缓存（会把构建产物上传第三方） |
-| `@biomejs/biome` | 格式化 + lint | 根、`packages/tooling` | P0 | 已定 | 规则集中在 `biome.json`；不在子包覆盖规则，除非写明原因 |
-| `typescript` | 类型检查 | 根 | P0 | 已定 | 共享 `tsconfig` 在 `packages/tooling` |
+| `@biomejs/biome` | 格式化 + lint | 根 | P0 | 已定 | 规则集中在根 `biome.json`；不在子包覆盖规则，除非写明原因；不格式化 Markdown（`markdown.formatter.enabled: false`，文档排版由作者负责） |
+| `typescript` | 类型检查 | 各包 | P0 | 已定 | 共享 `tsconfig` 在 `packages/tooling`；各包以 `devDependencies` 精确版本声明 |
 | `vitest` | 单元 / 集成测试 | 各包 | P0 | 已定 | 共享配置在 `packages/tooling`；`--coverage` 用 v8 |
+| `@vitest/coverage-v8` | vitest 的 v8 覆盖率提供方 | 各包 | P0 | 已定 | 版本必须与 `vitest` 完全相同；作为 `vitest` 的配套，不单独写 ADR |
+| `@types/node` | Node 类型定义 | 各包 | P0 | 已定 | 大版本与 Node 基线一致（26）；作为 `typescript` 的配套，不单独写 ADR |
 | `lefthook` | 本地 git 钩子 | 根 | P0 | 已定 | 提交前：Biome、gitleaks、变更包类型检查 |
 | `knip` | 未使用的文件、导出、依赖 | 根 | P0 | 已定 | CI 每周运行；报告进 Issue |
 | `tsx` | 运行 TS 脚本 | 根 | P0 | 已定 | 仅脚本与开发；生产镜像运行编译产物 |
 | `zod` | schema 唯一来源 | `packages/contracts`、`packages/config-schema` | P1 | 已定 | 前后端共用；schema 只在 `contracts` 定义 |
 | `@asteasolutions/zod-to-openapi` | zod → `openapi.yaml` | `packages/contracts` | P1 | 默认（V3） | 生成产物入库，CI 校验与源一致 |
-| `openapi-typescript` | OpenAPI → TS 类型（admin） | `apps/admin` | P9 | 已定 | 生成文件不手改 |
+| `openapi-typescript` | OpenAPI → TS 类型（admin） | `apps/admin-web` | P9 | 已定 | 生成文件不手改 |
 
 ### 4.2 后端（`apps/server`）
 
@@ -356,7 +359,7 @@ CI 每次运行 `pnpm licenses list --json` 并与允许列表比对；iOS 依�
 | `testcontainers` | 集成测试 | P2 | 已定 | 镜像与 §3.2 同一 digest |
 | ffmpeg（发行版二进制） | 增益校准、真峰值限制、响度测量 | P3 | 已定 | 只在 `server-audio` 镜像；以子进程调用，参数白名单化，不拼接外部字符串；不链接 libav 库 |
 
-### 4.3 管理后台（`apps/admin`）与共享 UI（`packages/ui`）
+### 4.3 管理后台（`apps/admin-web`）与共享 UI（`packages/ui`）
 
 | 库 | 用途 | 阶段 | 状态 | 使用规范 |
 | --- | --- | --- | --- | --- |
@@ -750,9 +753,9 @@ packages:
   - packages/*
   - tools/*
 
-# 只允许这些依赖运行安装脚本；新增需在 PR 中说明原因
-onlyBuiltDependencies:
-  - esbuild
+# 只允许列出的依赖运行安装脚本（pnpm 11 起取代 onlyBuiltDependencies）；新增需在 PR 中说明原因
+# 写法示例：`esbuild: true`；P0 时没有需要构建的依赖，为空
+allowBuilds: {}
 
 # 新版本发布满 3 天（单位：分钟）才允许安装
 minimumReleaseAge: 4320

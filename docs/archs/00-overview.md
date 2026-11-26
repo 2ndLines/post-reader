@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.2（2026-11-26） |
+| 文档版本 | v1.3（2026-11-26） |
 | v1.1 变更 | 新增 05 文档索引；待决策项 D9–D16（D16：未决事项一律取各表「未决前的默认」）；`ErrorCode` 增加 `DAILY_LIMIT`、`AUTH_REVOKED`、`SERVICE_PAUSED`、`BRANCH_DISABLED`、`SITE_RULE_DISABLED`；`config/` 补齐 `clients`、`regions`、`privacy`、`ops`、`review-accounts`、`vendors/pricing`；依据改为主 PRD v2.7 草案与三份子 PRD；新增 `config/credit-rates/<region>.yaml`（统一额度池费率系数）与 `vendors/pricing/<region>.yaml`（渠道单价），`quota.update` 改为 `remainingMc` |
 | v1.2 变更 | 长远方案：D4、D6、D7 改为已定；新增 D17–D24（边缘层 Hono + Workers、R2、水印、多平台、隐私法域、两区安全层、审批策略、实验）；WS 协议增加 `chapter.map`、`seek`、`seek.ack`，`progress` 改为位置语义；新增 `Platform`、`StoreProvider`、`AttestProvider`、`Jurisdiction` 枚举；仓库新增 `apps/edge`、`packages/signed-url`；规格补全：WS 增加 `extend`、`job.capped`、`job.truncated` |
+| v1.3 变更 | 仓库结构（§2）与实际目录对齐：`docs/archs/`、`docs/prds/`、`docs/tasks/`、`docs/progress/`，补 `tools/`、`.mise.toml`、`knip.json` |
 | 依据 | 主 PRD v2.7 草案；《iOS 客户端 PRD》v1.3、《管理后台 PRD》v1.3、《测试台架 PRD》v1.3；在线文档《技术选型分析》（Claude 文档）的两个标签页：「技术选型分析」页（选型结论与各端选型）与「完整技术架构」页（下文简称「完整技术架构」，即在线版系统架构设计） |
 | 读者 | 参与开发的工程师与 AI 编码代理 |
 | 本文范围 | 文档索引、系统边界、仓库结构、共享包、跨端约定、待决策项 |
@@ -99,14 +100,18 @@ post-reader/
 ├─ config/                         # 配置即代码（见第 5 节）
 ├─ evals/                          # promptfoo 配置与 fixtures
 ├─ infra/                          # Pulumi
+├─ tools/                          # 仓库内工具（vendor-mock、本地容器配置等）
 ├─ docs/
-│  ├─ architecture/                # 本套文档
+│  ├─ archs/                       # 本套文档与 AI 开发手册
+│  ├─ prds/                        # 产品需求
 │  ├─ adr/                         # 架构决策记录
-│  ├─ specs/                       # 功能级任务规格
-│  └─ runbooks/                    # 运维手册
+│  ├─ tasks/                       # 任务卡
+│  ├─ progress/                    # 进度与交接
+│  ├─ specs/                       # 功能级任务规格（按需建立）
+│  └─ runbooks/                    # 运维手册（按需建立）
 ├─ .github/workflows/
-├─ package.json  pnpm-workspace.yaml  turbo.json  biome.json  lefthook.yml
-└─ .nvmrc  .xcode-version
+├─ package.json  pnpm-workspace.yaml  turbo.json  biome.json  knip.json  lefthook.yml
+└─ .mise.toml  .nvmrc  .xcode-version
 ```
 
 ### 2.1 依赖方向
