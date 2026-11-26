@@ -1,0 +1,52 @@
+# 受保护路径：必须由负责人审阅（playbook §9.4；任务卡 P0-REPO-03）。
+# 需配合 main 规则集中的「Require review from Code Owners」才会强制生效（docs/progress/github-settings.md）。
+# CODEOWNERS 不支持 {a,b}，§9.4 中的花括号在此逐条展开；`pnpm check:codeowners` 校验两者一致。
+# 规则自上而下，后出现的匹配优先；本文件只有一个负责人，顺序不影响结果。
+
+# 后端：认证、额度、计费、注销、加密与 KMS、迁移、后台权限矩阵
+/apps/server/src/modules/auth/**              @2ndLines
+/apps/server/src/modules/quota/**             @2ndLines
+/apps/server/src/modules/billing/**           @2ndLines
+/apps/server/src/modules/deletion/**          @2ndLines
+/apps/server/src/platform/crypto/**           @2ndLines
+/apps/server/src/platform/kms/**              @2ndLines
+/apps/server/drizzle/**                       @2ndLines
+/apps/server/src/modules/admin/permissions.ts @2ndLines
+
+# 清洗与摘要规格
+/packages/canonical-spec/**                   @2ndLines
+
+# 配置即代码：提示词、schema、白名单、档位与额度
+/config/prompts/**                            @2ndLines
+/config/schemas/**                            @2ndLines
+/config/allowlist.yaml                        @2ndLines
+/config/tiers.yaml                            @2ndLines
+/config/quotas.yaml                           @2ndLines
+
+# 门禁阈值与期望结果
+/evals/gates.yaml                             @2ndLines
+/evals/fixtures/**/expected*                  @2ndLines
+
+# iOS：存储、网络、商务、Now Playing、权限声明、证书固定
+/apps/ios/Packages/Storage/**                 @2ndLines
+/apps/ios/Packages/Networking/**              @2ndLines
+/apps/ios/Packages/Commerce/**                @2ndLines
+/apps/ios/Packages/Audio/Sources/Audio/NowPlayingBridge* @2ndLines
+/apps/ios/App/*.entitlements                  @2ndLines
+/apps/ios/App/Info.plist                      @2ndLines
+/apps/ios/Config/Pins.xcconfig                @2ndLines
+
+# 基础设施与 CI
+/infra/**                                     @2ndLines
+/.github/workflows/**                         @2ndLines
+
+# 规则文件：根 AGENTS.md、各端 AGENTS.md、AI 开发手册
+/AGENTS.md                                    @2ndLines
+**/AGENTS.md                                  @2ndLines
+/docs/archs/ai-dev-playbook.md                @2ndLines
+
+# 任务卡追加：助手配置、本地钩子、本文件
+/.claude/**                                   @2ndLines
+/.mcp.json                                    @2ndLines
+/lefthook.yml                                 @2ndLines
+/.github/CODEOWNERS                           @2ndLines

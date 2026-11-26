@@ -17,6 +17,8 @@ concurrency:
 env:
   DO_NOT_TRACK: "1"
   TURBO_TELEMETRY_DISABLED: "1"
+  # CI 中不安装本地 git 钩子（prepare 脚本里的 lefthook install）
+  LEFTHOOK: "0"
   # 与 .mise.toml 保持一致，由 pnpm check:versions 校验
   GITLEAKS_VERSION: "8.30.1"
   GITLEAKS_SHA256_LINUX_X64: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
@@ -50,6 +52,9 @@ jobs:
 
       - name: Action 固定 SHA
         run: pnpm check:pins
+
+      - name: CODEOWNERS 覆盖受保护路径
+        run: pnpm check:codeowners
 
       - name: Biome
         run: pnpm exec biome ci .
