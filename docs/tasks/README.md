@@ -17,6 +17,14 @@
 
 建议顺序：REPO-01 → CI-01 → REPO-03 → REPO-02 → REPO-04；REPO-05 在 REPO-01 之后即可并行。
 
+## P1 · 契约与规格
+
+出口条件（playbook §6.3）：TS 与 Swift 两侧黄金向量 100% 通过；`openapi.yaml` 可生成 Swift 客户端并编译。人工检查点：清洗规则、摘要算法、SSML 转义位置（D3）确认后冻结 `schemaVersion = 1`。
+
+| 编号 | 内容 | 依赖 | 需负责人 | 状态 |
+| --- | --- | --- | --- | --- |
+| [P1-SPEC-01](P1-SPEC-01.md) | `canonical-spec`：SPEC.md、TS 参考实现、黄金向量 | P0 | 确认 Q1–Q7，冻结 schemaVersion | PR 待审阅 |
+
 ## 之后
 
 P1 契约与规格（`canonical-spec` 黄金向量、`contracts` 含跳章 WS 消息）见 playbook §6.3；`packages/signed-url` 属 LT-01（P2–P3）。风险原型（iOS 切片拼接与跳章、WebKit 凭证、AudioSeal 开销、真实厂商首段延迟）按 §5.1「风险前置」在 P1–P4 各自首个任务中安排，届时另开任务卡。

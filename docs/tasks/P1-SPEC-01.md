@@ -85,3 +85,21 @@ Swift 实现（P1-IOS-01）；SSML 转义（D3：在 TTS 边界，P3）；`contr
 - **R2 格式不良的输入**：输入应当是合法的 Unicode 标量序列。TS 实现会先调用 `toWellFormed()`，把孤立代理替换为 U+FFFD；向量不覆盖孤立代理，因为 Swift 的 `String` 无法表示它。
 
 ## 交接记录（会话结束时填写）
+
+**2026-11-26 · AC1–AC5 已完成；待负责人在 P1 人工检查点确认 Q1–Q7 后冻结 `schemaVersion = 1`**
+
+- **AC1**：
+  - 7 个向量文件共 51 条，每个文件 5–9 条。
+  - `pnpm spec:vectors` 输出 `Tests 61 passed (61)`：51 条向量，加上向量集自检、`lp`、SHA-256、字段边界与非幂等等用例。
+  - 同时输出 `expectedHash：51 条，不一致 0 条`。
+- **AC2**：
+  - `expectedClean` 都是人工写出的。生成脚本只负责组装 JSON，并断言转义前后内容一致。
+  - `expectedHash` 由 `scripts/expected_hash.py`（只用 Python 标准库）根据 `expectedClean` 计算。回写前校验得到「不一致 51 条」，回写后得到「不一致 0 条」。
+  - `lp` 的字节布局用手算的十六进制断言（`""`、`"ab"`、`"你"`、`👍`）；SHA-256 用标准测试值 `"abc"`。
+- **AC3**：SPEC.md 对每一步都列出码位区段，不依赖 Unicode Script 属性。emoji 判定使用两侧都有的 `Emoji` 属性，并说明了 Unicode 版本差异带来的风险。
+- **AC4**：`pnpm verify`、`pnpm knip`、全部 `check:*` 都通过，CI 结果见 PR。
+- **AC5**：SPEC.md 的状态为「草案，待负责人确认」。
+- **测试中发现 Q7**：清洗不是幂等的。已写入 SPEC.md，同时影响 P1-CTR-01（`CanonicalPost` 中上报原文还是清洗结果）。
+- **顺带修复（在 `feat/p0-repo-04`，即 PR #8）**：P0-REPO-04 的 hooks 测试调用了 `locale`，knip 把它报为「未声明的二进制」。原因是我当时只跑了 verify，而 CI 不跑 knip。已在 knip 配置中忽略 `locale`，并把 `pnpm knip` 加入 CI。
+- **文档同步**：00 §3.2 改为指向 SPEC.md（00 升到 v1.5）。
+- **下一步**：P1-CTR-01（`packages/contracts`：基础枚举、`CanonicalPost`、错误码、problem+json）。
