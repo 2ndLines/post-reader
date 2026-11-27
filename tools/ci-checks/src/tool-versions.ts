@@ -8,6 +8,8 @@ export interface ToolVersionInput {
   nvmrc: string;
   packageJson: { packageManager?: string; engines?: { node?: string } };
   workflows: { file: string; content: string }[];
+  /** docker-compose.yml 内容：工作流中的 postgres 镜像必须与之同一 digest（05 §3.2） */
+  compose?: string;
 }
 
 /** 只解析 `[tools]` 段中 `name = "version"` 形式的行，足以覆盖本仓库的写法 */
@@ -65,6 +67,19 @@ export function checkToolVersions(input: ToolVersionInput): string[] {
         if (match[1] !== gitleaks) {
           errors.push(
             `${workflow.file} 中 GITLEAKS_VERSION（${match[1]}）与 .mise.toml（${gitleaks}）不一致`,
+          );
+        }
+      }
+    }
+  }
+
+  if (input.compose !== undefined) {
+    const composeImage = /^\s+image:\s+(postgres:\S+)/m.exec(input.compose)?.[1];
+    for (const workflow of input.workflows) {
+      for (const match of workflow.content.matchAll(/^\s+image:\s+(postgres:\S+)/gm)) {
+        if (match[1] !== composeImage) {
+          errors.push(
+            `${workflow.file} 中的 ${match[1]} 与 docker-compose.yml 的 ${composeImage ?? '（未找到）'} 不一致`,
           );
         }
       }

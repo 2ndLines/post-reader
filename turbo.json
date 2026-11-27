@@ -21,6 +21,9 @@
     },
     "verify": {
       "dependsOn": ["//#lint", "typecheck", "test"]
+    },
+    "test:int": {
+      "cache": false
     }
   }
 }

@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.8（2026-11-26） |
+| 文档版本 | v1.9（2026-11-26） |
 | v1.1 变更 | Xcode 27 构建基线；新增 VisionKit；说明 iOS 27 SDK 忽略 `UIDesignRequiresCompatibility`、快照覆盖 iOS 18 与 iOS 27 的原因；依据改为主 PRD v2.7 草案 |
 | v1.2 变更 | 新增 §3.8 Cloudflare 边缘与存储、§11 长远方案登记（Hono、Wrangler、AudioSeal、C2PA 等）；国内 Redis 改为开源版 7.0，海外对象存储改为 R2 |
+| v1.9 变更 | P2-SRV-02：Testcontainers 暂缓引入，集成测试改用真实的本地容器与 CI service 容器；`esbuild` 安装脚本禁用 |
 | v1.8 变更 | P2-SRV-01：`fastify-type-provider-zod` 暂不使用；OTel 改为按需插桩；`protobufjs` 安装脚本禁用 |
 | v1.7 变更 | P1-CTR-02：V3 已验证；`zod-to-openapi` 状态改为已定，`yaml`、swift-openapi 三件套提前到 P1 |
 | v1.6 变更 | P0-REPO-04：§6.6 补充 hooks 的实现约束（失败即关闭、变量写法、依赖 jq、只拦截文件工具）；附录 E 改为以仓库 `.claude/` 为准并列出差异 |
@@ -366,7 +367,7 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 | `@opentelemetry/sdk-node`、按需的 `@opentelemetry/instrumentation-*` | 追踪与指标 | P2 | 已定（不用 `auto-instrumentations-node`，P2-SRV-01 Q2） | `auto-instrumentations-node` 经 GCP 资源探测器带入 BlueOak 许可证的包，许可证策略待定（ADR 0017 约束 6），因此只安装用到的插桩（P2-SRV-01 为 http、pino；数据库与 Redis 的插桩随各自的卡加入）。关闭会记录 SQL 参数、HTTP 请求体或 URL 查询串的选项；span 属性不含用户数据 |
 | `@sentry/node` | 错误上报 | P3 | 已定 | `sendDefaultPii: false`；`beforeSend` 删除请求体、查询串、Cookie；国内 DSN 指向自建实例 |
 | `uuid` | UUIDv7 | P2 | 已定 | 数据库侧默认值用 PG 18 的 `uuidv7()`，应用侧需要预生成时用本库 |
-| `testcontainers` | 集成测试 | P2 | 已定 | 镜像与 §3.2 同一 digest |
+| `testcontainers` | 集成测试 | P2 | **暂缓引入（P2-SRV-02 Q2，待负责人）** | 其依赖树带入 5 个 BlueOak-1.0.0 许可证的包（只在开发依赖中）；放行需要修改许可证策略，属于门禁变更，待负责人在 ADR 0017 约束 6 中决定。在此之前，集成测试连接真实 PostgreSQL：本地用 `pnpm dev` 的容器，CI 用 service 容器，镜像与 §3.2 同一 digest（`pnpm check:versions` 校验） |
 | ffmpeg（发行版二进制） | 增益校准、真峰值限制、响度测量 | P3 | 已定 | 只在 `server-audio` 镜像；以子进程调用，参数白名单化，不拼接外部字符串；不链接 libav 库 |
 
 ### 4.3 管理后台（`apps/admin-web`）与共享 UI（`packages/ui`）

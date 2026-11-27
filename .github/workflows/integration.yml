@@ -1,0 +1,68 @@
+# 集成测试（05 §5.3 `integration`；02 §15、§17 第 3 条：真实 PostgreSQL，不 mock 数据库）。
+# 数据库用 service 容器，镜像与 docker-compose.yml 同一 digest（由 pnpm check:versions 校验）。
+# Testcontainers 待负责人决定其依赖树中 BlueOak 许可证的处理后再引入（P2-SRV-02 Q2）。
+name: integration
+
+on:
+  pull_request:
+    paths:
+      - apps/server/**
+      - packages/contracts/**
+      - packages/canonical-spec/**
+      - packages/config-schema/**
+      - pnpm-lock.yaml
+      - .github/workflows/integration.yml
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: integration-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DO_NOT_TRACK: "1"
+  TURBO_TELEMETRY_DISABLED: "1"
+  LEFTHOOK: "0"
+  TEST_DATABASE_URL: postgres://reader:reader-ci-only@127.0.0.1:5432/reader
+
+jobs:
+  integration:
+    name: integration
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:18.7@sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328
+        env:
+          POSTGRES_USER: reader
+          POSTGRES_PASSWORD: reader-ci-only
+          POSTGRES_DB: reader
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U reader -d reader"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    steps:
+      - name: 检出
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+
+      - name: 安装 Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 集成测试
+        run: pnpm test:int
