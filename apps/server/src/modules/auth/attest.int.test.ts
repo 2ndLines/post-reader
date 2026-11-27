@@ -84,6 +84,10 @@ beforeAll(async () => {
         },
         signature: { db: t.db, redis, kms, dekCache },
         attest: attestDeps(t.db),
+        rateLimits: {
+          ip: { capacity: 10_000, refillPerSecond: 10_000 },
+          user: { capacity: 10_000, refillPerSecond: 10_000 },
+        },
       }),
     { prefix: '/v1' },
   );

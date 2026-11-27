@@ -9,6 +9,7 @@ import { type ErrorCode, Health, PROBLEM_CONTENT_TYPE } from '@post-reader/contr
 import Fastify, { type FastifyError, type FastifyReply } from 'fastify';
 import type { Logger } from 'pino';
 import { AppError } from './errors.ts';
+import { RateLimitError } from './rate-limit.ts';
 import { RequestValidationError, zodSerializerCompiler, zodValidatorCompiler } from './zod.ts';
 
 declare module 'fastify' {
@@ -79,6 +80,8 @@ export async function buildApp(options: { logger: Logger; readiness: Readiness }
 
   app.setNotFoundHandler((_request, reply) => sendProblem(reply, 404, 'NOT_FOUND'));
   app.setErrorHandler((error: FastifyError, request, reply) => {
+    if (error instanceof RateLimitError)
+      reply.header('retry-after', String(error.retryAfterSeconds));
     if (error instanceof AppError)
       return sendProblem(reply, error.status, error.code, error.detail);
     if (error instanceof RequestValidationError) {
