@@ -200,7 +200,12 @@ export class AuthService {
    * 用条件 UPDATE 原子地「领取」旧会话：并发请求中只有一个成功，其余都按重用处理。
    */
   /** attestedDeviceId：启用 App Attest 时为通过断言的设备；必须是该会话的设备，否则 ATTEST_REQUIRED */
-  async refresh(refreshToken: string, attestedDeviceId?: string) {
+  /** beforeRotate：会话校验通过后、轮换之前调用（用户令牌桶）；抛错则不轮换 */
+  async refresh(
+    refreshToken: string,
+    attestedDeviceId?: string,
+    beforeRotate?: (userId: string) => Promise<void>,
+  ) {
     const { db } = this.#d;
     const now = this.#now();
     const [session] = await db
@@ -216,6 +221,7 @@ export class AuthService {
     if (attestedDeviceId !== undefined && session.deviceId !== attestedDeviceId) {
       throw new AppError('ATTEST_REQUIRED', 403, 'device');
     }
+    await beforeRotate?.(session.userId);
 
     const claimed = await db
       .update(sessions)

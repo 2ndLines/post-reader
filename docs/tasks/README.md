@@ -8,12 +8,12 @@
 
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
-| [P0-REPO-01](P0-REPO-01.md) | Monorepo 骨架与工具链锁定 | — | — | PR 待审阅 |
-| [P0-REPO-02](P0-REPO-02.md) | 规则文件与文档导入收尾 | REPO-01 | 审阅各端 AGENTS.md | PR 待审阅；AC3 待负责人 |
-| [P0-CI-01](P0-CI-01.md) | `ci` 工作流与分支保护 | REPO-01 | 在 GitHub 开启分支保护 | PR 待审阅；AC4 待负责人 |
-| [P0-REPO-03](P0-REPO-03.md) | 本地钩子、CODEOWNERS、PR 模板 | REPO-01、CI-01 | — | PR 待审阅；AC2 待负责人 |
-| [P0-REPO-04](P0-REPO-04.md) | 助手工具配置（权限、钩子、skills、子代理、MCP） | REPO-02 | 审阅全部 `.claude/`；配置只读 PAT | PR 待审阅；AC4 待新会话 |
-| [P0-REPO-05](P0-REPO-05.md) | 本地容器环境与验证项 V1、V4、V5 | REPO-01 | V5 需两区云账号只读查询 | PR 待审阅；V5 API 复核待负责人 |
+| [P0-REPO-01](P0-REPO-01.md) | Monorepo 骨架与工具链锁定 | — | — | 已合并（2026-11-27） |
+| [P0-REPO-02](P0-REPO-02.md) | 规则文件与文档导入收尾 | REPO-01 | 审阅各端 AGENTS.md | 已合并（2026-11-27）；AC3 待负责人 |
+| [P0-CI-01](P0-CI-01.md) | `ci` 工作流与分支保护 | REPO-01 | 在 GitHub 开启分支保护 | 已合并（2026-11-27）；AC4 待负责人 |
+| [P0-REPO-03](P0-REPO-03.md) | 本地钩子、CODEOWNERS、PR 模板 | REPO-01、CI-01 | — | 已合并（2026-11-27）；AC2 待负责人 |
+| [P0-REPO-04](P0-REPO-04.md) | 助手工具配置（权限、钩子、skills、子代理、MCP） | REPO-02 | 审阅全部 `.claude/`；配置只读 PAT | 已合并（2026-11-27）；AC4 已在会话中实测（见任务卡） |
+| [P0-REPO-05](P0-REPO-05.md) | 本地容器环境与验证项 V1、V4、V5 | REPO-01 | V5 需两区云账号只读查询 | 已合并（2026-11-27）；V5 API 复核待负责人 |
 
 建议顺序：REPO-01 → CI-01 → REPO-03 → REPO-02 → REPO-04；REPO-05 在 REPO-01 之后即可并行。
 
@@ -23,12 +23,12 @@
 
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
-| [P1-SPEC-01](P1-SPEC-01.md) | `canonical-spec`：SPEC.md、TS 参考实现、黄金向量 | P0 | 确认 Q1–Q7，冻结 schemaVersion | PR 待审阅 |
-| [P1-IOS-01](P1-IOS-01.md) | `ReaderCore`：Swift 清洗与摘要，读取同一组向量 | SPEC-01 | — | PR 待审阅 |
-| [P1-CTR-01](P1-CTR-01.md) | `contracts`：基础枚举、`CanonicalPost`、错误码、problem+json | SPEC-01 | 确认 Q1（400 与 422） | PR 待审阅 |
-| [P1-CTR-02](P1-CTR-02.md) | 公共 API 契约、`openapi.yaml` 生成与 Swift 客户端（V3） | CTR-01、CTR-03 | 确认 Q1–Q3（响应结构、请求头） | PR 待审阅 |
-| [P1-CTR-04](P1-CTR-04.md) | `config-schema` 与 `config/` 初始文件（未标定参数显式标记） | CTR-01 | 提供 10 项标定值；确认 Q1–Q3 | PR 待审阅 |
-| [P1-CTR-03](P1-CTR-03.md) | WebSocket 消息类型与兼容性测试 | CTR-01 | 确认 Q1（降级原因取值） | PR 待审阅 |
+| [P1-SPEC-01](P1-SPEC-01.md) | `canonical-spec`：SPEC.md、TS 参考实现、黄金向量 | P0 | 确认 Q1–Q7，冻结 schemaVersion | 已合并（2026-11-27） |
+| [P1-IOS-01](P1-IOS-01.md) | `ReaderCore`：Swift 清洗与摘要，读取同一组向量 | SPEC-01 | — | 已合并（2026-11-27） |
+| [P1-CTR-01](P1-CTR-01.md) | `contracts`：基础枚举、`CanonicalPost`、错误码、problem+json | SPEC-01 | 确认 Q1（400 与 422） | 已合并（2026-11-27） |
+| [P1-CTR-02](P1-CTR-02.md) | 公共 API 契约、`openapi.yaml` 生成与 Swift 客户端（V3） | CTR-01、CTR-03 | 确认 Q1–Q3（响应结构、请求头） | 已合并（2026-11-27） |
+| [P1-CTR-04](P1-CTR-04.md) | `config-schema` 与 `config/` 初始文件（未标定参数显式标记） | CTR-01 | 提供 10 项标定值；确认 Q1–Q3 | 已合并（2026-11-27） |
+| [P1-CTR-03](P1-CTR-03.md) | WebSocket 消息类型与兼容性测试 | CTR-01 | 确认 Q1（降级原因取值） | 已合并（2026-11-27） |
 
 ## P2 · 后端基础
 
@@ -36,14 +36,15 @@
 
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
-| [P2-SRV-01](P2-SRV-01.md) | `platform`：env、日志脱敏、OTel、Fastify 工厂、problem+json、健康检查 | P1 | 确认 Q1–Q3（两处偏离 05，readyz 错误码） | PR 待审阅 |
-| [P2-SRV-02](P2-SRV-02.md) | `platform/db` 与身份相关的 5 张表、集成测试、迁移不可变检查 | SRV-01 | Q2：是否接受 Testcontainers 依赖树中的 BlueOak 许可证 | PR 待审阅 |
-| [P2-SRV-03](P2-SRV-03.md) | `platform/redis`：令牌桶 Lua、nonce、R_daily、会话吊销、验证码冷却 | SRV-01 | Q1（超限时计数是否回退） | PR 待审阅 |
-| [P2-SRV-04](P2-SRV-04.md) | `platform/kms` 与字段加密（本地文件密钥模拟 KMS） | SRV-02 | Q1（AAD 绑定规则）、Q2（版本字节） | PR 待审阅 |
-| [P2-SRV-05](P2-SRV-05.md) | `auth`：邮箱验证码、Sign in with Apple、令牌签发与轮换、吊销 | SRV-02–04 | Q1–Q4（并发刷新、计费时区、账号关联） | PR 待审阅 |
-| [P2-SRV-06](P2-SRV-06.md) | 请求签名中间件与重放测试（与 iOS 共用的黄金向量） | SRV-05 | Q1（规范化查询串）、Q2（时间窗的错误码） | PR 待审阅 |
-| [P2-SRV-07](P2-SRV-07.md) | App Attest：证明登记、断言校验，`/auth/refresh` 要求设备证明 | SRV-05 | Q1（合成测试数据）、Q2（clientData 格式） | PR 待审阅 |
-| [P2-SRV-08](P2-SRV-08.md) | 厂商 Mock 服务：回放、录制（需授权）、延迟 / 错误 / 挂起 / 断开注入 | SRV-01 | Q1（是否进 compose）、Q2（02 §15 的目录位置） | PR 待审阅 |
+| [P2-SRV-01](P2-SRV-01.md) | `platform`：env、日志脱敏、OTel、Fastify 工厂、problem+json、健康检查 | P1 | 确认 Q1–Q3（两处偏离 05，readyz 错误码） | 已合并（2026-11-27） |
+| [P2-SRV-02](P2-SRV-02.md) | `platform/db` 与身份相关的 5 张表、集成测试、迁移不可变检查 | SRV-01 | Q2：是否接受 Testcontainers 依赖树中的 BlueOak 许可证 | 已合并（2026-11-27） |
+| [P2-SRV-03](P2-SRV-03.md) | `platform/redis`：令牌桶 Lua、nonce、R_daily、会话吊销、验证码冷却 | SRV-01 | Q1（超限时计数是否回退） | 已合并（2026-11-27） |
+| [P2-SRV-04](P2-SRV-04.md) | `platform/kms` 与字段加密（本地文件密钥模拟 KMS） | SRV-02 | Q1（AAD 绑定规则）、Q2（版本字节） | 已合并（2026-11-27） |
+| [P2-SRV-05](P2-SRV-05.md) | `auth`：邮箱验证码、Sign in with Apple、令牌签发与轮换、吊销 | SRV-02–04 | Q1–Q4（并发刷新、计费时区、账号关联） | 已合并（2026-11-27） |
+| [P2-SRV-06](P2-SRV-06.md) | 请求签名中间件与重放测试（与 iOS 共用的黄金向量） | SRV-05 | Q1（规范化查询串）、Q2（时间窗的错误码） | 已合并（2026-11-27） |
+| [P2-SRV-07](P2-SRV-07.md) | App Attest：证明登记、断言校验，`/auth/refresh` 要求设备证明 | SRV-05 | Q1（合成测试数据）、Q2（clientData 格式） | 已合并（2026-11-27） |
+| [P2-SRV-08](P2-SRV-08.md) | 厂商 Mock 服务：回放、录制（需授权）、延迟 / 错误 / 挂起 / 断开注入 | SRV-01 | Q1（是否进 compose）、Q2（02 §15 的目录位置） | 已合并（2026-11-27） |
+| [P2-SRV-09](P2-SRV-09.md) | 频控挂载：认证接口的 IP 令牌桶、`/auth/refresh` 的用户令牌桶（补齐 P2 出口条件） | SRV-03、SRV-05 | Q1（非生产环境的未标定桶）、Q2（trustProxy）、Q3（`Retry-After`） | PR 待审阅 |
 
 ## 之后
 

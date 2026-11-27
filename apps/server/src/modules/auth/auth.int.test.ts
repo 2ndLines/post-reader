@@ -94,6 +94,11 @@ beforeAll(async () => {
           enforce: false,
           nodeEnv: 'test',
         },
+        // 频控在 rate-limit.int.test.ts 中单独测试；这里给足够大的桶，让代码路径照常执行
+        rateLimits: {
+          ip: { capacity: 10_000, refillPerSecond: 10_000 },
+          user: { capacity: 10_000, refillPerSecond: 10_000 },
+        },
       }),
     { prefix: '/v1' },
   );

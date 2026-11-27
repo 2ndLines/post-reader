@@ -1,6 +1,7 @@
 /**
  * /v1/auth/*（02 §4.2）。请求与响应 schema 来自 packages/contracts。受保护路径。
- * 频控（IP 令牌桶、用户令牌桶）在参数标定后挂载（P1-CTR-04 未标定）；签名校验在 P2-SRV-06；Attest 在 P2-SRV-07。
+ * 频控按 02 §4.2：/auth/apple 与 /auth/email/code 用 IP 令牌桶，/auth/refresh 用用户令牌桶（P2-SRV-09）；
+ * /attest/* 的「设备」频控没有对应参数，待《风控与反滥用策略规范》给出。签名校验在 P2-SRV-06；Attest 在 P2-SRV-07。
  */
 import {
   AppleSignInRequest,
@@ -17,6 +18,7 @@ import type { Redis } from 'ioredis';
 import type { JWTVerifyGetKey } from 'jose';
 import type { z } from 'zod';
 import { AppError } from '../../platform/http/errors.ts';
+import { enforceBucket, ipRateLimit, type RateLimits } from '../../platform/http/rate-limit.ts';
 import { type AppleCodeExchanger, AppleTokenError, verifyAppleIdentityToken } from './apple.ts';
 import {
   type AttestDeps,
@@ -50,6 +52,7 @@ export interface AuthRouteDeps {
   apple: { jwks: JWTVerifyGetKey; bundleId: string; exchanger: AppleCodeExchanger };
   signature: SignatureDeps;
   attest: AttestDeps;
+  rateLimits: RateLimits;
 }
 
 /** preHandler：校验 Authorization: Bearer <accessToken>，结果放在 request.auth */
@@ -66,14 +69,19 @@ export async function authRoutes(app: FastifyInstance, deps: AuthRouteDeps): Pro
   app.decorateRequest('auth', undefined);
   app.decorateRequest('attestedDeviceId', undefined);
   const { service, redis } = deps;
+  const ipLimit = ipRateLimit(redis, deps.rateLimits.ip);
 
-  app.post('/auth/email/code', { schema: { body: EmailCodeRequest } }, async (request, reply) => {
-    const { email } = request.body as z.infer<typeof EmailCodeRequest>;
-    const hash = emailHash(deps.emailHashKey, email);
-    if (!(await issueEmailCode(redis, deps.mailer, hash, email)))
-      throw new AppError('RATE_LIMITED', 429);
-    return reply.status(204).send();
-  });
+  app.post(
+    '/auth/email/code',
+    { preHandler: ipLimit, schema: { body: EmailCodeRequest } },
+    async (request, reply) => {
+      const { email } = request.body as z.infer<typeof EmailCodeRequest>;
+      const hash = emailHash(deps.emailHashKey, email);
+      if (!(await issueEmailCode(redis, deps.mailer, hash, email)))
+        throw new AppError('RATE_LIMITED', 429);
+      return reply.status(204).send();
+    },
+  );
 
   app.post(
     '/auth/email/verify',
@@ -93,7 +101,7 @@ export async function authRoutes(app: FastifyInstance, deps: AuthRouteDeps): Pro
 
   app.post(
     '/auth/apple',
-    { schema: { body: AppleSignInRequest, response: { 200: AuthSession } } },
+    { preHandler: ipLimit, schema: { body: AppleSignInRequest, response: { 200: AuthSession } } },
     async (request) => {
       const body = request.body as z.infer<typeof AppleSignInRequest>;
       let identity: Awaited<ReturnType<typeof verifyAppleIdentityToken>>;
@@ -135,6 +143,8 @@ export async function authRoutes(app: FastifyInstance, deps: AuthRouteDeps): Pro
       return service.refresh(
         refreshToken,
         deps.attest.enforce ? request.attestedDeviceId : undefined,
+        // 用户令牌桶：会话校验通过后、轮换之前消耗，超限时旧 refresh token 仍然有效
+        (userId) => enforceBucket(redis, 'user', userId, deps.rateLimits.user),
       );
     },
   );
