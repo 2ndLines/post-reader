@@ -1,0 +1,2861 @@
+# 由 packages/contracts 生成（pnpm contracts:gen），请勿手改
+openapi: 3.1.0
+info:
+  title: Post&Comments Reader 公共 API
+  version: 1.0.0
+  description: 由 packages/contracts 生成，请勿手改。接口表见 docs/archs/02-backend.md §4.2。
+servers:
+  - url: /v1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: accessToken（ES256）；refresh 与 Apple 通知各有单独的凭据
+  schemas:
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          default: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        detail:
+          type: string
+        instance:
+          type: string
+        code:
+          type: string
+          enum:
+            - AUTH_EXPIRED
+            - SIGNATURE_INVALID
+            - REPLAY_DETECTED
+            - ATTEST_REQUIRED
+            - RATE_LIMITED
+            - QUOTA_EXHAUSTED
+            - TIER_REQUIRED
+            - REGION_MISMATCH
+            - CONTENT_BLOCKED
+            - UPSTREAM_DEGRADED
+            - VALIDATION_FAILED
+            - CLIENT_TOO_OLD
+            - DAILY_LIMIT
+            - AUTH_REVOKED
+            - SERVICE_PAUSED
+            - BRANCH_DISABLED
+            - SITE_RULE_DISABLED
+            - NOT_FOUND
+            - INTERNAL
+        traceId:
+          type: string
+          minLength: 1
+        resetAt:
+          type: string
+          format: date-time
+      required:
+        - title
+        - status
+        - code
+        - traceId
+    CanonicalPost:
+      type: object
+      properties:
+        schemaVersion:
+          type: number
+          enum:
+            - 1
+        source:
+          type: object
+          properties:
+            site:
+              type: string
+              minLength: 1
+            url:
+              type: string
+              format: uri
+            postId:
+              type: string
+              minLength: 1
+            fetchedAt:
+              type: string
+              format: date-time
+            cacheScope:
+              type: string
+              enum:
+                - PUBLIC
+                - PRIVATE
+          required:
+            - site
+            - url
+            - postId
+            - fetchedAt
+            - cacheScope
+        langHint:
+          type: string
+          pattern: ^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*$
+        units:
+          type: array
+          items:
+            type: object
+            properties:
+              unitId:
+                type: string
+                minLength: 1
+              kind:
+                type: string
+                enum:
+                  - post
+                  - comment
+              authorId:
+                type: string
+                minLength: 1
+              authorDisplay:
+                type: string
+              parentId:
+                type: string
+                minLength: 1
+              parentConfidence:
+                type: string
+                enum:
+                  - high
+                  - low
+              cleanText:
+                type: string
+              likes:
+                type: integer
+                minimum: 0
+              hasImages:
+                type: boolean
+              hasVideo:
+                type: boolean
+              hash:
+                type: string
+                pattern: ^[0-9a-f]{64}$
+            required:
+              - unitId
+              - kind
+              - authorId
+              - parentConfidence
+              - cleanText
+              - hasImages
+              - hasVideo
+              - hash
+          minItems: 1
+      required:
+        - schemaVersion
+        - source
+        - units
+    Prefs:
+      type: object
+      properties:
+        density:
+          type: string
+          enum:
+            - brief
+            - standard
+            - deep
+        weights:
+          type: array
+          items:
+            type: string
+            enum:
+              - op_replies
+              - practical_reversal
+              - dedupe_spam
+        style:
+          type: string
+          enum:
+            - solo_radio
+            - duo_roundtable
+            - fireside
+            - rapid_cut
+            - crowd_list
+      required:
+        - density
+        - weights
+        - style
+    AuthSession:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          minLength: 1
+        refreshToken:
+          type: string
+          minLength: 1
+        sessionKey:
+          type: string
+          pattern: ^[A-Za-z0-9+/]*={0,2}$
+        user:
+          type: object
+          properties:
+            userId:
+              type: string
+              minLength: 1
+            homeRegion:
+              type: string
+              enum:
+                - cn
+                - intl
+            tier:
+              type: string
+              enum:
+                - free
+                - plus
+                - pro
+          required:
+            - userId
+            - homeRegion
+            - tier
+      required:
+        - accessToken
+        - refreshToken
+        - sessionKey
+        - user
+    Me:
+      type: object
+      properties:
+        tier:
+          type: string
+          enum:
+            - free
+            - plus
+            - pro
+        quota:
+          type: object
+          properties:
+            remainingMc:
+              type: integer
+            grantedMc:
+              type: integer
+              minimum: 0
+            resetAt:
+              type: string
+              format: date-time
+            rateVersion:
+              type: string
+              minLength: 1
+          required:
+            - remainingMc
+            - grantedMc
+            - resetAt
+            - rateVersion
+        periodEnd:
+          type: string
+          format: date-time
+        homeRegion:
+          type: string
+          enum:
+            - cn
+            - intl
+        billingTz:
+          type: string
+          minLength: 1
+        flags:
+          type: object
+          additionalProperties:
+            type: boolean
+        entitlements:
+          type: object
+          properties:
+            densities:
+              type: array
+              items:
+                type: string
+                enum:
+                  - brief
+                  - standard
+                  - deep
+            styles:
+              type: array
+              items:
+                type: string
+                enum:
+                  - solo_radio
+                  - duo_roundtable
+                  - fireside
+                  - rapid_cut
+                  - crowd_list
+          required:
+            - densities
+            - styles
+      required:
+        - tier
+        - quota
+        - periodEnd
+        - homeRegion
+        - billingTz
+        - flags
+        - entitlements
+    JobStatus:
+      type: object
+      properties:
+        jobId:
+          type: string
+          minLength: 1
+        state:
+          type: string
+          enum:
+            - created
+            - admitted
+            - planning
+            - scripting
+            - synthesizing
+            - completed
+            - rejected
+            - failed
+            - cancelled
+            - quota_exhausted
+        degraded:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                enum:
+                  - moderation
+                  - tts_backup
+                  - llm_backup
+                  - translation_dropped
+                  - select_fallback
+              - type: string
+                minLength: 1
+        readySegments:
+          type: integer
+          minimum: 0
+      required:
+        - jobId
+        - state
+        - degraded
+        - readySegments
+  parameters: {}
+paths:
+  /auth/apple:
+    post:
+      operationId: signInWithApple
+      summary: Sign in with Apple
+      security: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                identityToken:
+                  type: string
+                  minLength: 1
+                authorizationCode:
+                  type: string
+                  minLength: 1
+                nonce:
+                  type: string
+                  minLength: 1
+                deviceId:
+                  type: string
+                  minLength: 1
+                storefront:
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                ageConfirmed:
+                  type: boolean
+              required:
+                - identityToken
+                - authorizationCode
+                - nonce
+                - deviceId
+      responses:
+        "200":
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    minLength: 1
+                  refreshToken:
+                    type: string
+                    minLength: 1
+                  sessionKey:
+                    type: string
+                    pattern: ^[A-Za-z0-9+/]*={0,2}$
+                  user:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        minLength: 1
+                      homeRegion:
+                        type: string
+                        enum:
+                          - cn
+                          - intl
+                      tier:
+                        type: string
+                        enum:
+                          - free
+                          - plus
+                          - pro
+                    required:
+                      - userId
+                      - homeRegion
+                      - tier
+                required:
+                  - accessToken
+                  - refreshToken
+                  - sessionKey
+                  - user
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /auth/email/code:
+    post:
+      operationId: sendEmailCode
+      summary: 发送邮箱验证码
+      security: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+              required:
+                - email
+      responses:
+        "204":
+          description: 已发送
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /auth/email/verify:
+    post:
+      operationId: verifyEmailCode
+      summary: 邮箱验证码登录
+      security: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                code:
+                  type: string
+                  minLength: 1
+                  maxLength: 16
+                deviceId:
+                  type: string
+                  minLength: 1
+                storefront:
+                  type: string
+                  pattern: ^[A-Z]{3}$
+                ageConfirmed:
+                  type: boolean
+              required:
+                - email
+                - code
+                - deviceId
+      responses:
+        "200":
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    minLength: 1
+                  refreshToken:
+                    type: string
+                    minLength: 1
+                  sessionKey:
+                    type: string
+                    pattern: ^[A-Za-z0-9+/]*={0,2}$
+                  user:
+                    type: object
+                    properties:
+                      userId:
+                        type: string
+                        minLength: 1
+                      homeRegion:
+                        type: string
+                        enum:
+                          - cn
+                          - intl
+                      tier:
+                        type: string
+                        enum:
+                          - free
+                          - plus
+                          - pro
+                    required:
+                      - userId
+                      - homeRegion
+                      - tier
+                required:
+                  - accessToken
+                  - refreshToken
+                  - sessionKey
+                  - user
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /auth/refresh:
+    post:
+      operationId: refreshSession
+      summary: 刷新令牌（轮换 refresh token）
+      security: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: App Attest keyId（P1-CTR-02 Q3）
+          required: true
+          description: App Attest keyId（P1-CTR-02 Q3）
+          name: X-Attest-Key-Id
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: App Attest assertion，base64（P1-CTR-02 Q3）
+          required: true
+          description: App Attest assertion，base64（P1-CTR-02 Q3）
+          name: X-Attest-Assertion
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  minLength: 1
+              required:
+                - refreshToken
+      responses:
+        "200":
+          description: 新的令牌对
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    minLength: 1
+                  refreshToken:
+                    type: string
+                    minLength: 1
+                  sessionKey:
+                    type: string
+                    pattern: ^[A-Za-z0-9+/]*={0,2}$
+                required:
+                  - accessToken
+                  - refreshToken
+                  - sessionKey
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /auth/logout:
+    post:
+      operationId: logout
+      summary: 退出登录
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          required: true
+          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 一次性随机数，600 s 内不可重复
+          required: true
+          description: 一次性随机数，600 s 内不可重复
+          name: X-Nonce
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          required: true
+          description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          name: X-Sig
+          in: header
+      responses:
+        "204":
+          description: 已退出
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /attest/challenge:
+    post:
+      operationId: createAttestChallenge
+      summary: 获取 App Attest 挑战
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      responses:
+        "200":
+          description: 一次性挑战
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  challenge:
+                    type: string
+                    minLength: 1
+                  expiresAt:
+                    type: string
+                    format: date-time
+                required:
+                  - challenge
+                  - expiresAt
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /attest/verify:
+    post:
+      operationId: verifyAttestation
+      summary: 提交 App Attest 证明
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                keyId:
+                  type: string
+                  minLength: 1
+                attestation:
+                  type: string
+                  pattern: ^[A-Za-z0-9+/]*={0,2}$
+                challenge:
+                  type: string
+                  minLength: 1
+              required:
+                - keyId
+                - attestation
+                - challenge
+      responses:
+        "204":
+          description: 已验证
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /me:
+    get:
+      operationId: getMe
+      summary: 账户、档位、额度与开关
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      responses:
+        "200":
+          description: 当前账户
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tier:
+                    type: string
+                    enum:
+                      - free
+                      - plus
+                      - pro
+                  quota:
+                    type: object
+                    properties:
+                      remainingMc:
+                        type: integer
+                      grantedMc:
+                        type: integer
+                        minimum: 0
+                      resetAt:
+                        type: string
+                        format: date-time
+                      rateVersion:
+                        type: string
+                        minLength: 1
+                    required:
+                      - remainingMc
+                      - grantedMc
+                      - resetAt
+                      - rateVersion
+                  periodEnd:
+                    type: string
+                    format: date-time
+                  homeRegion:
+                    type: string
+                    enum:
+                      - cn
+                      - intl
+                  billingTz:
+                    type: string
+                    minLength: 1
+                  flags:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+                  entitlements:
+                    type: object
+                    properties:
+                      densities:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - brief
+                            - standard
+                            - deep
+                      styles:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - solo_radio
+                            - duo_roundtable
+                            - fireside
+                            - rapid_cut
+                            - crowd_list
+                    required:
+                      - densities
+                      - styles
+                required:
+                  - tier
+                  - quota
+                  - periodEnd
+                  - homeRegion
+                  - billingTz
+                  - flags
+                  - entitlements
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+    patch:
+      operationId: updateMe
+      summary: 更新计费时区（30 天内只能改一次）
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          required: true
+          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 一次性随机数，600 s 内不可重复
+          required: true
+          description: 一次性随机数，600 s 内不可重复
+          name: X-Nonce
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          required: true
+          description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          name: X-Sig
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                billingTz:
+                  type: string
+                  minLength: 1
+              required:
+                - billingTz
+      responses:
+        "200":
+          description: 更新后的账户
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tier:
+                    type: string
+                    enum:
+                      - free
+                      - plus
+                      - pro
+                  quota:
+                    type: object
+                    properties:
+                      remainingMc:
+                        type: integer
+                      grantedMc:
+                        type: integer
+                        minimum: 0
+                      resetAt:
+                        type: string
+                        format: date-time
+                      rateVersion:
+                        type: string
+                        minLength: 1
+                    required:
+                      - remainingMc
+                      - grantedMc
+                      - resetAt
+                      - rateVersion
+                  periodEnd:
+                    type: string
+                    format: date-time
+                  homeRegion:
+                    type: string
+                    enum:
+                      - cn
+                      - intl
+                  billingTz:
+                    type: string
+                    minLength: 1
+                  flags:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+                  entitlements:
+                    type: object
+                    properties:
+                      densities:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - brief
+                            - standard
+                            - deep
+                      styles:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                            - solo_radio
+                            - duo_roundtable
+                            - fireside
+                            - rapid_cut
+                            - crowd_list
+                    required:
+                      - densities
+                      - styles
+                required:
+                  - tier
+                  - quota
+                  - periodEnd
+                  - homeRegion
+                  - billingTz
+                  - flags
+                  - entitlements
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /quota/reference:
+    get:
+      operationId: getQuotaReference
+      summary: 本档位的参考消耗
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      responses:
+        "200":
+          description: 参考消耗
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rateVersion:
+                    type: string
+                    minLength: 1
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        category:
+                          type: string
+                          enum:
+                            - audio_minute
+                            - translation_kchar
+                            - orchestration_ktoken
+                        approxPoints:
+                          type: number
+                          minimum: 0
+                      required:
+                        - category
+                        - approxPoints
+                required:
+                  - rateVersion
+                  - items
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /account:
+    delete:
+      operationId: deleteAccount
+      summary: 注销账号（需近 5 分钟内重新认证）
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          required: true
+          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 一次性随机数，600 s 内不可重复
+          required: true
+          description: 一次性随机数，600 s 内不可重复
+          name: X-Nonce
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          required: true
+          description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          name: X-Sig
+          in: header
+      responses:
+        "202":
+          description: 已受理
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    minLength: 1
+                  deadlineAt:
+                    type: string
+                    format: date-time
+                required:
+                  - requestId
+                  - deadlineAt
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /jobs:
+    post:
+      operationId: createJob
+      summary: 创建生成任务
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          required: true
+          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 一次性随机数，600 s 内不可重复
+          required: true
+          description: 一次性随机数，600 s 内不可重复
+          name: X-Nonce
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          required: true
+          description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          name: X-Sig
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: App Attest keyId（P1-CTR-02 Q3）
+          required: true
+          description: App Attest keyId（P1-CTR-02 Q3）
+          name: X-Attest-Key-Id
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: App Attest assertion，base64（P1-CTR-02 Q3）
+          required: true
+          description: App Attest assertion，base64（P1-CTR-02 Q3）
+          name: X-Attest-Assertion
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 同一键重放返回 200 与原任务
+          required: true
+          description: 同一键重放返回 200 与原任务
+          name: Idempotency-Key
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post:
+                  type: object
+                  properties:
+                    schemaVersion:
+                      type: number
+                      enum:
+                        - 1
+                    source:
+                      type: object
+                      properties:
+                        site:
+                          type: string
+                          minLength: 1
+                        url:
+                          type: string
+                          format: uri
+                        postId:
+                          type: string
+                          minLength: 1
+                        fetchedAt:
+                          type: string
+                          format: date-time
+                        cacheScope:
+                          type: string
+                          enum:
+                            - PUBLIC
+                            - PRIVATE
+                      required:
+                        - site
+                        - url
+                        - postId
+                        - fetchedAt
+                        - cacheScope
+                    langHint:
+                      type: string
+                      pattern: ^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*$
+                    units:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          unitId:
+                            type: string
+                            minLength: 1
+                          kind:
+                            type: string
+                            enum:
+                              - post
+                              - comment
+                          authorId:
+                            type: string
+                            minLength: 1
+                          authorDisplay:
+                            type: string
+                          parentId:
+                            type: string
+                            minLength: 1
+                          parentConfidence:
+                            type: string
+                            enum:
+                              - high
+                              - low
+                          cleanText:
+                            type: string
+                          likes:
+                            type: integer
+                            minimum: 0
+                          hasImages:
+                            type: boolean
+                          hasVideo:
+                            type: boolean
+                          hash:
+                            type: string
+                            pattern: ^[0-9a-f]{64}$
+                        required:
+                          - unitId
+                          - kind
+                          - authorId
+                          - parentConfidence
+                          - cleanText
+                          - hasImages
+                          - hasVideo
+                          - hash
+                      minItems: 1
+                  required:
+                    - schemaVersion
+                    - source
+                    - units
+                prefs:
+                  type: object
+                  properties:
+                    density:
+                      type: string
+                      enum:
+                        - brief
+                        - standard
+                        - deep
+                    weights:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                          - op_replies
+                          - practical_reversal
+                          - dedupe_spam
+                    style:
+                      type: string
+                      enum:
+                        - solo_radio
+                        - duo_roundtable
+                        - fireside
+                        - rapid_cut
+                        - crowd_list
+                  required:
+                    - density
+                    - weights
+                    - style
+                targetLang:
+                  type: string
+                  pattern: ^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*$
+                readMode:
+                  type: string
+                  enum:
+                    - translated
+                    - original
+                passthroughLangs:
+                  type: array
+                  items:
+                    type: string
+                    pattern: ^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*$
+              required:
+                - post
+                - prefs
+                - targetLang
+                - readMode
+                - passthroughLangs
+      responses:
+        "200":
+          description: 幂等重放
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    minLength: 1
+                  streamUrl:
+                    type: string
+                    format: uri
+                required:
+                  - jobId
+                  - streamUrl
+        "201":
+          description: 已创建
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    minLength: 1
+                  streamUrl:
+                    type: string
+                    format: uri
+                required:
+                  - jobId
+                  - streamUrl
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /jobs/{id}:
+    get:
+      operationId: getJob
+      summary: 任务状态
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 任务 ID
+          required: true
+          description: 任务 ID
+          name: id
+          in: path
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      responses:
+        "200":
+          description: 任务状态
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    minLength: 1
+                  state:
+                    type: string
+                    enum:
+                      - created
+                      - admitted
+                      - planning
+                      - scripting
+                      - synthesizing
+                      - completed
+                      - rejected
+                      - failed
+                      - cancelled
+                      - quota_exhausted
+                  degraded:
+                    type: array
+                    items:
+                      anyOf:
+                        - type: string
+                          enum:
+                            - moderation
+                            - tts_backup
+                            - llm_backup
+                            - translation_dropped
+                            - select_fallback
+                        - type: string
+                          minLength: 1
+                  readySegments:
+                    type: integer
+                    minimum: 0
+                required:
+                  - jobId
+                  - state
+                  - degraded
+                  - readySegments
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /jobs/{id}/cancel:
+    post:
+      operationId: cancelJob
+      summary: 取消任务
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 任务 ID
+          required: true
+          description: 任务 ID
+          name: id
+          in: path
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          required: true
+          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 一次性随机数，600 s 内不可重复
+          required: true
+          description: 一次性随机数，600 s 内不可重复
+          name: X-Nonce
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          required: true
+          description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          name: X-Sig
+          in: header
+      responses:
+        "204":
+          description: 已取消
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /jobs/{id}/ack:
+    post:
+      operationId: ackJob
+      summary: 确认已播放到的下行序号
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 任务 ID
+          required: true
+          description: 任务 ID
+          name: id
+          in: path
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          required: true
+          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 一次性随机数，600 s 内不可重复
+          required: true
+          description: 一次性随机数，600 s 内不可重复
+          name: X-Nonce
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          required: true
+          description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          name: X-Sig
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                playedThroughSeq:
+                  type: integer
+                  minimum: 0
+              required:
+                - playedThroughSeq
+      responses:
+        "204":
+          description: 已确认
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /samples:
+    get:
+      operationId: listSamples
+      summary: 预置样帖
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      responses:
+        "200":
+          description: 样帖列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  samples:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sampleId:
+                          type: string
+                          minLength: 1
+                        title:
+                          type: string
+                        lang:
+                          type: string
+                          pattern: ^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{1,8})*$
+                        audioUrl:
+                          type: string
+                          format: uri
+                        expiresAt:
+                          type: string
+                          format: date-time
+                        durationMs:
+                          type: integer
+                          exclusiveMinimum: 0
+                        script:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              role:
+                                type: string
+                                enum:
+                                  - host
+                                  - op
+                                  - commenter
+                              text:
+                                type: string
+                            required:
+                              - role
+                              - text
+                      required:
+                        - sampleId
+                        - title
+                        - lang
+                        - audioUrl
+                        - expiresAt
+                        - durationMs
+                        - script
+                required:
+                  - samples
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /config/bundle:
+    get:
+      operationId: getConfigBundle
+      summary: client 类配置包与签名
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            description: 上次的 ETag
+          required: false
+          description: 上次的 ETag
+          name: If-None-Match
+          in: header
+      responses:
+        "200":
+          description: 配置包
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  bundle:
+                    type: string
+                    minLength: 1
+                  signature:
+                    type: object
+                    properties:
+                      alg:
+                        type: string
+                        enum:
+                          - Ed25519
+                          - ES256
+                      kid:
+                        type: string
+                        minLength: 1
+                      sig:
+                        type: string
+                        minLength: 1
+                    required:
+                      - alg
+                      - kid
+                      - sig
+                required:
+                  - bundle
+                  - signature
+        "304":
+          description: 未变化
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /subscriptions/sync:
+    post:
+      operationId: syncSubscription
+      summary: 同步 StoreKit 交易
+      security:
+        - bearerAuth: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+        - schema:
+            type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          required: true
+          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: 一次性随机数，600 s 内不可重复
+          required: true
+          description: 一次性随机数，600 s 内不可重复
+          name: X-Nonce
+          in: header
+        - schema:
+            type: string
+            minLength: 1
+            description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          required: true
+          description: base64url(HMAC-SHA256(k_sess, string_to_sign))
+          name: X-Sig
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signedTransactionInfo:
+                  type: string
+                  minLength: 1
+              required:
+                - signedTransactionInfo
+      responses:
+        "200":
+          description: 最新档位与额度
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tier:
+                    type: string
+                    enum:
+                      - free
+                      - plus
+                      - pro
+                  quota:
+                    type: object
+                    properties:
+                      remainingMc:
+                        type: integer
+                      grantedMc:
+                        type: integer
+                        minimum: 0
+                    required:
+                      - remainingMc
+                      - grantedMc
+                required:
+                  - tier
+                  - quota
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /webhooks/app-store:
+    post:
+      operationId: appStoreNotification
+      summary: App Store 服务器通知（Apple JWS）
+      security: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                signedPayload:
+                  type: string
+                  minLength: 1
+              required:
+                - signedPayload
+      responses:
+        "200":
+          description: 已接收
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /healthz:
+    get:
+      operationId: healthz
+      summary: 存活
+      security: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      responses:
+        "200":
+          description: 存活
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - ok
+                required:
+                  - status
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+  /readyz:
+    get:
+      operationId: readyz
+      summary: 就绪
+      security: []
+      parameters:
+        - schema:
+            type: string
+            minLength: 1
+            description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          required: true
+          description: 客户端版本；低于最低版本时返回 426 CLIENT_TOO_OLD
+          name: X-Client-Version
+          in: header
+      responses:
+        "200":
+          description: 就绪
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - ok
+                required:
+                  - status
+        default:
+          description: 错误（RFC 9457 problem+json）；客户端只按 code 分支处理
+          content:
+            application/problem+json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    default: about:blank
+                  title:
+                    type: string
+                  status:
+                    type: integer
+                    minimum: 400
+                    maximum: 599
+                  detail:
+                    type: string
+                  instance:
+                    type: string
+                  code:
+                    type: string
+                    enum:
+                      - AUTH_EXPIRED
+                      - SIGNATURE_INVALID
+                      - REPLAY_DETECTED
+                      - ATTEST_REQUIRED
+                      - RATE_LIMITED
+                      - QUOTA_EXHAUSTED
+                      - TIER_REQUIRED
+                      - REGION_MISMATCH
+                      - CONTENT_BLOCKED
+                      - UPSTREAM_DEGRADED
+                      - VALIDATION_FAILED
+                      - CLIENT_TOO_OLD
+                      - DAILY_LIMIT
+                      - AUTH_REVOKED
+                      - SERVICE_PAUSED
+                      - BRANCH_DISABLED
+                      - SITE_RULE_DISABLED
+                      - NOT_FOUND
+                      - INTERNAL
+                  traceId:
+                    type: string
+                    minLength: 1
+                  resetAt:
+                    type: string
+                    format: date-time
+                required:
+                  - title
+                  - status
+                  - code
+                  - traceId
+webhooks: {}

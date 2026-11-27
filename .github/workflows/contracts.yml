@@ -1,0 +1,55 @@
+# 契约与规格改动时运行 Swift 侧检查（05 §5.3 `contracts`）：
+# - ReaderCore 读取 packages/canonical-spec/vectors 做黄金向量测试（TS 侧在 ci 工作流的单元测试中）
+# - APIClient 用 swift-openapi-generator 从 openapi.yaml 生成客户端并编译、测试（05 §1.2 V3）
+# 生成物与源一致由 ci 工作流的 `pnpm contracts:check` 校验。
+# 说明：GitHub 运行器的默认 Xcode 为 26.x，与项目基线 Xcode 27.2（.xcode-version）不同；
+# 这里只作为两侧一致性与可编译性的补充检查，iOS 的正式构建在 Xcode Cloud（05 §5.4，P4 起）。
+name: contracts
+
+on:
+  pull_request:
+    paths:
+      - packages/contracts/**
+      - packages/canonical-spec/**
+      - apps/ios/Packages/ReaderCore/**
+      - apps/ios/Packages/APIClient/**
+      - .github/workflows/contracts.yml
+  push:
+    branches: [main]
+    paths:
+      - packages/contracts/**
+      - packages/canonical-spec/**
+      - apps/ios/Packages/ReaderCore/**
+      - apps/ios/Packages/APIClient/**
+      - .github/workflows/contracts.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contracts-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swift:
+    name: swift
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - name: 检出
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: 工具链版本
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: ReaderCore 黄金向量（与 TS 侧同一组 vectors）
+        working-directory: apps/ios/Packages/ReaderCore
+        run: swift test
+
+      - name: APIClient 生成、编译与测试
+        working-directory: apps/ios/Packages/APIClient
+        run: swift test

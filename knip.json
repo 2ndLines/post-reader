@@ -18,7 +18,7 @@
       "project": ["**/*.ts"]
     },
     "packages/contracts": {
-      "entry": ["src/**/*.test.ts"],
+      "entry": ["src/**/*.test.ts", "scripts/*.ts"],
       "project": ["**/*.ts"]
     }
   }

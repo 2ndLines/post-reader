@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-26（P0 全部实现；P1-SPEC-01、P1-IOS-01、P1-CTR-01、P1-CTR-03 实现，PR 待审阅）
+最后更新：2026-11-26（P0 全部实现；P1-SPEC-01、P1-IOS-01、P1-CTR-01、P1-CTR-02、P1-CTR-03 实现，PR 待审阅）
 
 ## 当前阶段
-P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：P1-SPEC-01（草案）与 P1-IOS-01 已实现，TS 与 Swift 两侧 51 条黄金向量全部通过。合规确认与供应商选型并行等待中。
+P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 张卡中 5 张已实现。P1 出口条件的两项都已满足：TS 与 Swift 两侧 51 条黄金向量全部通过；`openapi.yaml` 生成的 Swift 客户端能编译（V3）。剩余的 P1-CTR-04 需要负责人提供标定参数。合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P1-CTR-02：02 §4.2 的 20 个接口全部生成为 OpenAPI 3.1（与接口表自动比对），`pnpm contracts:check` 已接入 CI；V3 已验证（Swift 客户端在 macOS 与 iOS 模拟器上编译并通过测试）；新增 `contracts` 工作流
 - P1-CTR-03：WebSocket 上行与下行消息契约（与 00 §3.1 自动比对），兼容规则测试（未知 `t` 忽略、多出的字段丢弃、`protocol` 校验）
 - P1-CTR-01：`packages/contracts` 的基础枚举（与 00 §3.1 表格自动比对）、`CanonicalPost`、`ErrorCode`、problem+json
 - P1-IOS-01：`apps/ios/Packages/ReaderCore`（Swift 6，只依赖 Foundation 与 CryptoKit），51 条向量在 macOS 宿主机与 iOS 27.2 模拟器上全部通过
@@ -35,7 +36,7 @@ P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：P1-
 - 海外模型与 TTS 零留存（ZDR）合同未申请
 
 ## 负责人待办（按顺序）
-1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → #7 REPO-05 → #8 REPO-04 → #9 SPEC-01 → #10 IOS-01 → #11 CTR-01 → #12 CTR-03
+1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → #7 REPO-05 → #8 REPO-04 → #9 SPEC-01 → #10 IOS-01 → #11 CTR-01 → #12 CTR-03 → CTR-02（本轮最后一个 PR）
 2. 决定助手推送与提 PR 的身份（机器用户或 GitHub App），然后开启 `main` 规则集（docs/progress/github-settings.md）
 3. 补做需要你操作的验收：CI-01 AC4（向 `main` 直推被拒）、REPO-03 AC2（Code Owner 自动请求审阅）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5（两区 KMS 只读 API 复核，命令见 ADR 0018）
 4. 创建只读的 fine-grained PAT，并在本机设置 `GITHUB_MCP_TOKEN`（`.mcp.json` 中的 github MCP 用）
@@ -51,10 +52,7 @@ P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：P1-
 - [ ] D14：以上确认后，主 PRD v2.7 定稿
 
 ## 下一步建议
-1. **P1-CTR-02**（API 契约与 `openapi.yaml`）：不需要负责人输入，下一会话可以直接开工。
-   - 先完成 V3：验证 `@asteasolutions/zod-to-openapi` 与 zod 4.6.7 是否兼容，以及生成的文件能否被 swift-openapi-generator 使用。swift-openapi-generator 需按 `add-dependency` 流程登记。
-   - 再按 02 §4.2 的接口表逐个定义接口。
-   - 在 05 §5.3 的 `contracts` 工作流中加入 macOS 上的 `swift test`（ReaderCore），让 Swift 侧的向量测试进入 CI。
+1. **P1-CTR-02 已完成**（PR 待审阅）。后续可以把共享枚举改为 `$ref`，让 Swift 侧共用同一个类型（任务卡 R2）。
 2. **P1-CTR-04**（`config-schema` 与初始的 `langs`、`tiers`、`quotas`、`flags`）：**需要负责人先提供输入**。
    - 以下参数在 PRD 中都标为「待标定」，没有可用的默认值：`Q_free`、`Q_plus`、`Q_pro`（《商业化精算与配额配置表》）、`R_daily`（风控标定）、`N_brief`、`N_min`、`N_max`、`N_deep`（采编策略规范），以及令牌桶参数。
    - PRD 11.1 中各档位可用的 `weights` 与 `style` 只有文字描述（「基础过滤」「加权开关」「全风格高阶定制」），没有逐项列出。
