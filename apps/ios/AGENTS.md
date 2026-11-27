@@ -3,9 +3,11 @@
 先读根目录 [AGENTS.md](../../AGENTS.md)；本文件只补充本端约定，不得与根规则冲突（playbook §0.1）。
 依据：架构 [01](../../docs/archs/01-ios-client.md) §2、§21、§23；playbook §8.1、§9.4。
 
-## 命令（P4-IOS-01 起可用，此前目录只有占位）
+## 命令（P4-IOS-01 起可用）
 - `make -C apps/ios project`：由 `project.yml` 生成工程（XcodeGen）
 - `make -C apps/ios lint test`：SwiftLint、SwiftFormat 检查与模拟器测试；宣称完成前必须通过
+- `make -C apps/ios format`：SwiftFormat 改写；`make -C apps/ios build`：只构建
+- 工具版本由根 `.mise.toml` 固定（xcodegen、swiftlint、swiftformat），Makefile 经 `mise exec` 调用
 - 需要看界面时：`xcrun simctl io booted screenshot <文件>`，截图附在 PR 中
 
 ## 工程与目录

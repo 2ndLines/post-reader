@@ -48,31 +48,44 @@ public enum Cleaner {
         if s[j] == "#" {
             j += 1
             let isHex = j < s.count && (s[j] == "x" || s[j] == "X")
-            if isHex { j += 1 }
+            if isHex {
+                j += 1
+            }
             let digitsStart = j
-            while j < s.count, isHex ? isHexDigit(s[j]) : isDecimalDigit(s[j]) { j += 1 }
+            while j < s.count, isHex ? isHexDigit(s[j]) : isDecimalDigit(s[j]) {
+                j += 1
+            }
             let digitCount = j - digitsStart
             let maxDigits = isHex ? 6 : 7
             guard digitCount >= 1, digitCount <= maxDigits, j < s.count, s[j] == ";" else { return nil }
-            let digits = String(String.UnicodeScalarView(s[digitsStart..<j]))
+            let digits = String(String.UnicodeScalarView(s[digitsStart ..< j]))
             let value = UInt32(digits, radix: isHex ? 16 : 10) ?? 0
-            let valid = value > 0 && value <= 0x10FFFF && !(0xD800...0xDFFF).contains(value)
+            let valid = value > 0 && value <= 0x10FFFF && !(0xD800 ... 0xDFFF).contains(value)
             let scalar = valid ? (Unicode.Scalar(value) ?? replacement) : replacement
             return (scalar, j - start + 1)
         }
         let nameStart = j
-        while j < s.count, isAsciiLetter(s[j]) { j += 1 }
+        while j < s.count, isAsciiLetter(s[j]) {
+            j += 1
+        }
         guard j < s.count, s[j] == ";" else { return nil }
-        let name = String(String.UnicodeScalarView(s[nameStart..<j]))
+        let name = String(String.UnicodeScalarView(s[nameStart ..< j]))
         guard let scalar = namedEntities[name] else { return nil }
         return (scalar, j - start + 1)
     }
 
-    private static func isDecimalDigit(_ c: Unicode.Scalar) -> Bool { ("0"..."9").contains(c) }
-    private static func isHexDigit(_ c: Unicode.Scalar) -> Bool {
-        isDecimalDigit(c) || ("a"..."f").contains(c) || ("A"..."F").contains(c)
+    private static func isDecimalDigit(_ c: Unicode.Scalar) -> Bool {
+        ("0" ... "9").contains(c)
     }
-    private static func isAsciiLetter(_ c: Unicode.Scalar) -> Bool { ("a"..."z").contains(c) || ("A"..."Z").contains(c) }
+
+    private static func isHexDigit(_ c: Unicode.Scalar) -> Bool {
+        isDecimalDigit(c) || ("a" ... "f").contains(c) || ("A" ... "F").contains(c)
+    }
+
+    private static func isAsciiLetter(_ c: Unicode.Scalar) -> Bool {
+        ("a" ... "z").contains(c) || ("A" ... "Z")
+            .contains(c)
+    }
 
     // MARK: 第 3 步
 
@@ -86,7 +99,9 @@ public enum Cleaner {
             let v = input[i].value
             if v == 0x0D {
                 out.append(lf)
-                if i + 1 < input.count, input[i + 1] == lf { i += 1 }
+                if i + 1 < input.count, input[i + 1] == lf {
+                    i += 1
+                }
             } else if v == 0x85 || v == 0x2028 || v == 0x2029 {
                 out.append(lf)
             } else {
@@ -98,17 +113,17 @@ public enum Cleaner {
     }
 
     static func isDeletedControl(_ v: UInt32) -> Bool {
-        v <= 0x09 || (0x0B...0x1F).contains(v) || (0x7F...0x9F).contains(v)
+        v <= 0x09 || (0x0B ... 0x1F).contains(v) || (0x7F ... 0x9F).contains(v)
             || v == 0xFEFF || v == 0x200B || v == 0x2060
-            || (0x202A...0x202E).contains(v) || (0x2066...0x2069).contains(v)
+            || (0x202A ... 0x202E).contains(v) || (0x2066 ... 0x2069).contains(v)
     }
 
     // MARK: 第 4 步
 
     private static let joiningRanges: [ClosedRange<UInt32>] = [
-        0x0600...0x06FF, 0x0700...0x074F, 0x0750...0x077F, 0x07C0...0x07FF,
-        0x0860...0x086F, 0x0870...0x089F, 0x08A0...0x08FF, 0x0900...0x0D7F,
-        0x0D80...0x0DFF, 0x1800...0x18AF, 0xFB50...0xFDFF, 0xFE70...0xFEFE,
+        0x0600 ... 0x06FF, 0x0700 ... 0x074F, 0x0750 ... 0x077F, 0x07C0 ... 0x07FF,
+        0x0860 ... 0x086F, 0x0870 ... 0x089F, 0x08A0 ... 0x08FF, 0x0900 ... 0x0D7F,
+        0x0D80 ... 0x0DFF, 0x1800 ... 0x18AF, 0xFB50 ... 0xFDFF, 0xFE70 ... 0xFEFE,
     ]
 
     private static func isJoiningScript(_ c: Unicode.Scalar?) -> Bool {
@@ -130,10 +145,14 @@ public enum Cleaner {
             guard v == zwnj || v == zwj else { return true }
             let prev = i > 0 ? s[i - 1] : nil
             let next = i + 1 < s.count ? s[i + 1] : nil
-            if isJoiningScript(prev), isJoiningScript(next) { return true }
+            if isJoiningScript(prev), isJoiningScript(next) {
+                return true
+            }
             guard v == zwj else { return false }
             var j = i - 1
-            while j >= 0, s[j].value == 0xFE0F || s[j].value == 0xFE0E { j -= 1 }
+            while j >= 0, s[j].value == 0xFE0F || s[j].value == 0xFE0E {
+                j -= 1
+            }
             return isNonAsciiEmoji(j >= 0 ? s[j] : nil) && isNonAsciiEmoji(next)
         }
         return s.indices.filter { keep[$0] }.map { s[$0] }
@@ -143,7 +162,7 @@ public enum Cleaner {
 
     private static func isWhitespace(_ c: Unicode.Scalar) -> Bool {
         switch c.value {
-        case 0x20, 0xA0, 0x1680, 0x202F, 0x205F, 0x3000, 0x2000...0x200A: true
+        case 0x20, 0xA0, 0x1680, 0x202F, 0x205F, 0x3000, 0x2000 ... 0x200A: true
         default: false
         }
     }
@@ -153,20 +172,26 @@ public enum Cleaner {
         var joined: [Unicode.Scalar] = []
         joined.reserveCapacity(s.count)
         for (index, line) in lines.enumerated() {
-            if index > 0 { joined.append(lf) }
-            if !line.allSatisfy(isWhitespace) { joined.append(contentsOf: line) }
+            if index > 0 {
+                joined.append(lf)
+            }
+            if !line.allSatisfy(isWhitespace) {
+                joined.append(contentsOf: line)
+            }
         }
         var collapsed: [Unicode.Scalar] = []
         collapsed.reserveCapacity(joined.count)
         var run = 0
         for c in joined {
             run = c == lf ? run + 1 : 0
-            if c != lf || run <= 2 { collapsed.append(c) }
+            if c != lf || run <= 2 {
+                collapsed.append(c)
+            }
         }
         let isTrimmed: (Unicode.Scalar) -> Bool = { $0 == lf || isWhitespace($0) }
         guard let first = collapsed.firstIndex(where: { !isTrimmed($0) }),
               let last = collapsed.lastIndex(where: { !isTrimmed($0) })
         else { return [] }
-        return Array(collapsed[first...last])
+        return Array(collapsed[first ... last])
     }
 }

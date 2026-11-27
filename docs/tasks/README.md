@@ -57,6 +57,14 @@
 | [P3-SRV-04](P3-SRV-04.md) | `quota`：两层计量、`settleCall` 原子核销、退还、软着陆 | SRV-01（P3） | Q1（容错等价用量由调用方提供）、Q2（无账期时拒绝结算）；系数与单价待标定 | PR 待审阅 |
 | [P3-PIPE-02](P3-PIPE-02.md) | 分支 A 第一部分：音色分配、`select` 校验与降级、TTS 输入规范化与切句（纯函数） | — | Q1（音色约束改为整篇检查）；第二部分等 LLM 厂商与语种识别库 | 第一部分 PR 待审阅 |
 
+## P4 · iOS 基座（可与 P2、P3 并行）
+
+出口条件（playbook §6.6）：模拟器上可登录并播放样帖；快照测试覆盖全部已实现组件的深浅色与 3 档字体。人工检查点：负责人对照冻结原型确认视觉与交互。
+
+| 编号 | 内容 | 依赖 | 需负责人 | 状态 |
+| --- | --- | --- | --- | --- |
+| [P4-IOS-01](P4-IOS-01.md) | XcodeGen 工程、SPM 包骨架、xcconfig、能力、SwiftLint / SwiftFormat、`make`、Xcode Cloud 脚本 | P1-IOS-01 | Q1（Bundle ID、Team ID、D1）、Q2（lint 不在构建阶段）、Q3（iOS 18 模拟器）；Xcode Cloud 工作流需 Apple 账号 | PR 待审阅 |
+
 ## 之后
 
 P1 契约与规格（`canonical-spec` 黄金向量、`contracts` 含跳章 WS 消息）见 playbook §6.3；`packages/signed-url` 属 LT-01（P2–P3）。风险原型（iOS 切片拼接与跳章、WebKit 凭证、AudioSeal 开销、真实厂商首段延迟）按 §5.1「风险前置」在 P1–P4 各自首个任务中安排，届时另开任务卡。

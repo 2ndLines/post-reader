@@ -33,7 +33,7 @@ config/（配置即代码）  evals/（样本与门禁）  infra/（Pulumi）  t
 | `pnpm test:int` | 集成测试（真实 PostgreSQL；本地先 `pnpm dev`） | 可用 |
 | `pnpm db:migrate:new X` | 生成迁移（`drizzle-kit generate`；已发布迁移不可改，`pnpm check:migrations`） | 可用 |
 | `pnpm testbench run --suite pr --region intl` | 测试台架 | P3-TB-01 起 |
-| `make -C apps/ios project && make -C apps/ios lint test` | iOS 工程与测试 | P4-IOS-01 起 |
+| `make -C apps/ios project && make -C apps/ios lint test` | iOS 工程与测试（模拟器；`SIMULATOR=` 可换机型） | 可用 |
 
 各端补充规则见 `apps/*/AGENTS.md`。
 

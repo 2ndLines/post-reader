@@ -14,3 +14,9 @@ coverage/
 # SwiftPM 构建产物
 .build/
 .swiftpm/
+
+# iOS：工程由 XcodeGen 生成，不入库（01 §4.1）
+apps/ios/*.xcodeproj/
+apps/ios/*.xcworkspace/
+apps/ios/.build/
+xcuserdata/

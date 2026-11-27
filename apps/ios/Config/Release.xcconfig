@@ -1,0 +1,5 @@
+#include "Base.xcconfig"
+// 生产域名在 P11 之前填入
+API_HOST_INTL = api-intl.invalid
+API_HOST_CN = api-cn.invalid
+APP_ATTEST_ENVIRONMENT = production

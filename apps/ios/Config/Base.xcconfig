@@ -1,0 +1,9 @@
+// 所有配置共用（01 §4）。证书固定公钥在 Pins.xcconfig（P4-IOS-04，受保护路径）。
+// Bundle ID 前缀与 Team ID 为占位：需要 Apple 开发者账号（D1，P4 负责人待办）。
+BUNDLE_ID_PREFIX = com.example.postreader
+// 默认海外版；国内版在 D1 确定后作为第二个 App 目标加入（01 §4.3）
+HOME_REGION = intl
+PRODUCT_BUNDLE_IDENTIFIER = $(BUNDLE_ID_PREFIX)
+APP_GROUP_ID = group.$(BUNDLE_ID_PREFIX).shared
+MARKETING_VERSION = 0.1.0
+CURRENT_PROJECT_VERSION = 1
