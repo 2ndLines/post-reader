@@ -26,11 +26,11 @@ config/（配置即代码）  evals/（样本与门禁）  infra/（Pulumi）  t
 | `pnpm verify` | Biome + 类型检查 + 单元测试 | 可用；宣称完成前必须通过 |
 | `pnpm knip` | 未使用的文件、导出、依赖 | 可用 |
 | `pnpm check:versions` / `check:pins` / `check:licenses` / `check:codeowners` / `check:links` | CI 中的仓库级检查（工具版本、Action SHA、许可证、CODEOWNERS、文档链接） | 可用 |
-| `pnpm dev` | Docker Compose 拉起本地依赖 | P0-REPO-05 起 |
+| `pnpm dev` / `dev:down` | Docker Compose 拉起或停止本地依赖 | 可用 |
 | `pnpm contracts:gen` / `contracts:check` | 生成 `openapi.yaml`（并复制到 iOS APIClient）/ 校验生成物与源一致 | 可用 |
 | `pnpm spec:vectors` | 黄金向量（TS 测试 + 独立 Python 摘要复核） | 可用 |
-| `pnpm test:int` | 集成测试 | P2-SRV-02 起 |
-| `pnpm db:migrate:new X` | 生成迁移 | P2-SRV-02 起 |
+| `pnpm test:int` | 集成测试（真实 PostgreSQL；本地先 `pnpm dev`） | 可用 |
+| `pnpm db:migrate:new X` | 生成迁移（`drizzle-kit generate`；已发布迁移不可改，`pnpm check:migrations`） | 可用 |
 | `pnpm testbench run --suite pr --region intl` | 测试台架 | P3-TB-01 起 |
 | `make -C apps/ios project && make -C apps/ios lint test` | iOS 工程与测试 | P4-IOS-01 起 |
 

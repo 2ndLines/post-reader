@@ -12,6 +12,8 @@ allowBuilds:
   lefthook: false
   # OpenTelemetry 的间接依赖；安装脚本只做安装后自检，V1 实测不需要（ADR 0017）
   protobufjs: false
+  # drizzle-kit 依赖的 esbuild：安装后自检脚本，V1 实测不需要（ADR 0017）
+  esbuild: false
 
 # 新版本发布满 3 天（单位：分钟）才允许安装（05 §2.5）
 minimumReleaseAge: 4320

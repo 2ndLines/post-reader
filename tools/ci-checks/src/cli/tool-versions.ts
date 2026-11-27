@@ -6,6 +6,7 @@ const errors = checkToolVersions({
   nvmrc: readRepoFile('.nvmrc'),
   packageJson: JSON.parse(readRepoFile('package.json')),
   workflows: readWorkflows(),
+  compose: readRepoFile('docker-compose.yml'),
 });
 for (const error of errors) console.error(error);
 console.log(`工具版本一致性：${errors.length === 0 ? '通过' : `不一致 ${errors.length} 处`}`);

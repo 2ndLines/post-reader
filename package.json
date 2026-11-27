@@ -25,7 +25,10 @@
     "spec:vectors": "pnpm --filter @post-reader/canonical-spec test && python3 -I packages/canonical-spec/scripts/expected_hash.py",
     "contracts:gen": "node packages/contracts/scripts/gen-openapi.ts",
     "contracts:check": "node packages/contracts/scripts/gen-openapi.ts --check",
-    "check:config": "node packages/config-schema/scripts/check-config.ts"
+    "check:config": "node packages/config-schema/scripts/check-config.ts",
+    "test:int": "turbo run test:int",
+    "db:migrate:new": "pnpm --filter @post-reader/server db:migrate:new",
+    "check:migrations": "node tools/ci-checks/src/cli/migrations.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",

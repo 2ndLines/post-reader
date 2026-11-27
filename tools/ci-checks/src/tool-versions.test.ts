@@ -38,6 +38,22 @@ describe('checkToolVersions', () => {
     expect(errors.join('\n')).toMatch(/GITLEAKS_VERSION（8\.29\.0）/);
   });
 
+  it('工作流中的 postgres 镜像必须与 docker-compose.yml 一致', () => {
+    const compose = 'services:\n  postgres:\n    image: postgres:18.7@sha256:aaa\n';
+    const ok = {
+      file: 'int.yml',
+      content: 'services:\n  postgres:\n    image: postgres:18.7@sha256:aaa\n',
+    };
+    const bad = {
+      file: 'int.yml',
+      content: '      postgres:\n        image: postgres:18.6@sha256:bbb\n',
+    };
+    expect(checkToolVersions({ ...good, compose, workflows: [...good.workflows, ok] })).toEqual([]);
+    expect(checkToolVersions({ ...good, compose, workflows: [...good.workflows, bad] })).toEqual([
+      'int.yml 中的 postgres:18.6@sha256:bbb 与 docker-compose.yml 的 postgres:18.7@sha256:aaa 不一致',
+    ]);
+  });
+
   it('.mise.toml 缺项时报告缺失，而不是静默通过', () => {
     expect(checkToolVersions({ ...good, miseToml: '[tools]\n' })).toEqual([
       '.mise.toml 缺少 node 版本',

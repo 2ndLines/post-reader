@@ -21,6 +21,10 @@
     },
     "verify": {
       "dependsOn": ["//#lint", "typecheck", "test"]
+    },
+    "test:int": {
+      "cache": false,
+      "passThroughEnv": ["TEST_DATABASE_URL"]
     }
   }
 }

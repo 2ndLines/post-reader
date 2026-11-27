@@ -64,6 +64,9 @@ jobs:
       - name: openapi.yaml 与契约源一致
         run: pnpm contracts:check
 
+      - name: 已发布的迁移未被修改或删除
+        run: pnpm check:migrations
+
       - name: config/ 通过 schema（列出未标定参数，不因未标定失败）
         run: pnpm check:config
 

@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-26（P0、P1 全部实现；P2-SRV-01 实现，PR 待审阅）
+最后更新：2026-11-26（P0、P1 全部实现；P2-SRV-01、P2-SRV-02 实现，PR 待审阅）
 
 ## 当前阶段
 P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 张卡全部实现。P1 出口条件的两项都已满足：TS 与 Swift 两侧 51 条黄金向量全部通过；`openapi.yaml` 生成的 Swift 客户端能编译（V3）。P1-CTR-04 中有 10 项参数尚未标定（`pnpm check:config` 会逐项列出），需负责人提供；在此之前生产模式拒绝加载。合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P2-SRV-02：身份相关的 5 张表与首个迁移；在真实 PostgreSQL 18 上运行 8 条集成测试（约束、外键、级联删除）；新增 `integration` 工作流与「已发布迁移不可变」检查
 - P2-SRV-01：`apps/server` 平台层（env、日志脱敏、OTel、Fastify 工厂、problem+json、健康检查与优雅停机）与进程入口；36 个测试，含子进程启动与停机测试
 - P1-CTR-04：`packages/config-schema`，`config/` 下 langs、tiers、quotas、flags 四个文件；未标定参数显式标记，`pnpm check:config` 已接入 CI，`--production` 在仍有未标定参数时拒绝
 - P1-CTR-02：02 §4.2 的 20 个接口全部生成为 OpenAPI 3.1（与接口表自动比对），`pnpm contracts:check` 已接入 CI；V3 已验证（Swift 客户端在 macOS 与 iOS 模拟器上编译并通过测试）；新增 `contracts` 工作流
@@ -38,13 +39,14 @@ P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 �
 - 海外模型与 TTS 零留存（ZDR）合同未申请
 
 ## 负责人待办（按顺序）
-1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → #7 REPO-05 → #8 REPO-04 → #9 SPEC-01 → #10 IOS-01 → #11 CTR-01 → #12 CTR-03 → #13 CTR-02 → #14 CTR-04 → P2-SRV-01
+1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → #7 REPO-05 → #8 REPO-04 → #9 SPEC-01 → #10 IOS-01 → #11 CTR-01 → #12 CTR-03 → #13 CTR-02 → #14 CTR-04 → #15 P2-SRV-01 → P2-SRV-02
 2. 决定助手推送与提 PR 的身份（机器用户或 GitHub App），然后开启 `main` 规则集（docs/progress/github-settings.md）
 3. 补做需要你操作的验收：CI-01 AC4（向 `main` 直推被拒）、REPO-03 AC2（Code Owner 自动请求审阅）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5（两区 KMS 只读 API 复核，命令见 ADR 0018）
 4. 创建只读的 fine-grained PAT，并在本机设置 `GITHUB_MCP_TOKEN`（`.mcp.json` 中的 github MCP 用）
 5. 批准或修改 ADR 0017、0018
-6. P1 人工检查点：确认 P1-SPEC-01 的 Q1–Q7（清洗规则的默认解读），之后冻结 `schemaVersion = 1`
-7. P3 引入 promptfoo 前：决定其依赖树中 BlueOak、PSF、LGPL（libvips）等许可证的处理（ADR 0017 约束 6）
+6. **许可证（阻塞 Testcontainers）**：Testcontainers 的开发依赖带入 5 个 BlueOak 许可证的包。我曾尝试加例外，被自动模式的安全分类器拒绝（放宽门禁需由你决定），见 P2-SRV-02 Q2
+7. P1 人工检查点：确认 P1-SPEC-01 的 Q1–Q7（清洗规则的默认解读），之后冻结 `schemaVersion = 1`
+8. P3 引入 promptfoo 前：决定其依赖树中 BlueOak、PSF、LGPL（libvips）等许可证的处理（ADR 0017 约束 6）
 
 ## 待负责人决策
 - [ ] 助手推送与提 PR 的身份（机器用户或 GitHub App），之后开启 `main` 规则集（docs/progress/github-settings.md）
