@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.4（2026-11-26） |
+| 文档版本 | v1.5（2026-11-26） |
 | v1.1 变更 | 新增 05 文档索引；待决策项 D9–D16（D16：未决事项一律取各表「未决前的默认」）；`ErrorCode` 增加 `DAILY_LIMIT`、`AUTH_REVOKED`、`SERVICE_PAUSED`、`BRANCH_DISABLED`、`SITE_RULE_DISABLED`；`config/` 补齐 `clients`、`regions`、`privacy`、`ops`、`review-accounts`、`vendors/pricing`；依据改为主 PRD v2.7 草案与三份子 PRD；新增 `config/credit-rates/<region>.yaml`（统一额度池费率系数）与 `vendors/pricing/<region>.yaml`（渠道单价），`quota.update` 改为 `remainingMc` |
 | v1.2 变更 | 长远方案：D4、D6、D7 改为已定；新增 D17–D24（边缘层 Hono + Workers、R2、水印、多平台、隐私法域、两区安全层、审批策略、实验）；WS 协议增加 `chapter.map`、`seek`、`seek.ack`，`progress` 改为位置语义；新增 `Platform`、`StoreProvider`、`AttestProvider`、`Jurisdiction` 枚举；仓库新增 `apps/edge`、`packages/signed-url`；规格补全：WS 增加 `extend`、`job.capped`、`job.truncated` |
+| v1.5 变更 | §3.2 清洗与摘要规则改为指向 `packages/canonical-spec/SPEC.md`（唯一来源，P1-SPEC-01）|
 | v1.4 变更 | 配置包签名按区确定算法（ADR 0018，V5）：§5 发布流程、D18 注明签名 URL 不受影响 |
 | v1.3 变更 | 仓库结构（§2）与实际目录对齐：`docs/archs/`、`docs/prds/`、`docs/tasks/`、`docs/progress/`，补 `tools/`、`.mise.toml`、`knip.json` |
 | 依据 | 主 PRD v2.7 草案；《iOS 客户端 PRD》v1.3、《管理后台 PRD》v1.3、《测试台架 PRD》v1.3；在线文档《技术选型分析》（Claude 文档）的两个标签页：「技术选型分析」页（选型结论与各端选型）与「完整技术架构」页（下文简称「完整技术架构」，即在线版系统架构设计） |
@@ -262,9 +263,9 @@ packages/canonical-spec/
    └─ vectors.test.ts
 ```
 
-清洗与摘要规则（`schemaVersion = 1`）：
+清洗与摘要规则（`schemaVersion = 1`）的**唯一来源是 `packages/canonical-spec/SPEC.md`**（P1-SPEC-01；草案，待负责人在 P1 人工检查点确认后冻结）。下面只是摘要：
 
-1. 解码 HTML 实体 → 2. NFC → 3. 删除 C0/C1 控制字符（保留 `\n`）、BOM、U+200B、U+2060、U+202A–U+202E、U+2066–U+2069 → 4. U+200C/U+200D 仅在 emoji 序列或文字连写上下文中保留 → 5. 换行统一为 `\n`，连续空行折叠为一个，首尾空白去除 → 6. 不在本阶段做 SSML 转义（待决策项 D3）。
+1. 解码 HTML 实体（只解码一遍）→ 2. NFC → 3. 统一换行后，删除 C0/C1 控制字符（保留 `\n`）、BOM、U+200B、U+2060、U+202A–U+202E、U+2066–U+2069 → 4. U+200C、U+200D 只在 emoji 序列或连写文字上下文中保留 → 5. 连续空行折叠为一个，去除首尾空白 → 6. 不在本阶段做 SSML 转义（D3）。各步的精确码位范围与默认解读（Q1–Q7）见 SPEC.md。
 
 ```text
 H_i = hex( SHA256( lp(unitId) ‖ lp(authorId) ‖ lp(cleanText) ) )

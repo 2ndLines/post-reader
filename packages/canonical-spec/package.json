@@ -1,0 +1,22 @@
+{
+  "name": "@post-reader/canonical-spec",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "清洗与摘要规格（SPEC.md）、TS 参考实现与黄金向量；iOS ReaderCore 使用同一组向量",
+  "exports": {
+    ".": "./src/index.ts",
+    "./vectors/*.json": "./vectors/*.json"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@post-reader/tooling": "workspace:*",
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.1",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}

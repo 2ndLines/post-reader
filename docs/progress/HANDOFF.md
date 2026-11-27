@@ -22,7 +22,7 @@ Post&Comments Reader：用户把社交平台帖子链接分享、粘贴或扫码
 | `docs/prds/prd-admin-console.md` | v1.3 | 管理后台 PRD；第 10 节 Q1–Q18 |
 | `docs/prds/prd-testbench.md` | v1.3 | 后端 Web 测试台架 PRD；门禁 G1–G16；第 10 节 Q1–Q17 |
 | `docs/archs/prd-closure-review.md` | — | 业务闭环评审：第一至第四轮、统一额度池变更（§10）、长远方案修订（§11） |
-| `docs/archs/00-overview.md` | v1.4 | 总览、仓库结构、共享契约（含 WS 消息）、`config/` 清单、待决策项 D1–D24 |
+| `docs/archs/00-overview.md` | v1.5 | 总览、仓库结构、共享契约（含 WS 消息）、`config/` 清单、待决策项 D1–D24 |
 | `docs/archs/01-ios-client.md` | v1.3 | iOS 架构；§22 闭环增补、§23 Liquid Glass、§24 长远方案 |
 | `docs/archs/02-backend.md` | v1.2 | 后端；§9 计费两层计量、§18–§21 增补、§22 长远方案、§23 规格补全 |
 | `docs/archs/03-admin-console.md` | v1.2 | 管理后台架构 |

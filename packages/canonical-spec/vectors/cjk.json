@@ -1,0 +1,47 @@
+[
+  {
+    "name": "cjk-plain",
+    "raw": "今天天气很好，我们去公园吧。",
+    "unitId": "c_cjk_1",
+    "authorId": "u_1",
+    "expectedClean": "今天天气很好，我们去公园吧。",
+    "expectedHash": "41310747075df9767c6a7de1f087fb3bb998ebcb0a1f6058790f178e6a82227c",
+    "note": "无需改动"
+  },
+  {
+    "name": "cjk-hangul-jamo-nfc",
+    "raw": "한국어",
+    "unitId": "c_cjk_2",
+    "authorId": "u_2",
+    "expectedClean": "한국어",
+    "expectedHash": "8f7702c28e7842b068a357a57545c4b0a628a1695c3eae1e50591e2d29bf0be4",
+    "note": "NFC：组合用谚文字母合成为音节"
+  },
+  {
+    "name": "cjk-kana-dakuten-nfc",
+    "raw": "がき",
+    "unitId": "c_cjk_3",
+    "authorId": "u_3",
+    "expectedClean": "がき",
+    "expectedHash": "178965c216609d05762f284c922d62b9dde31da57e996e7d57d2e614ba53b462",
+    "note": "NFC：か + 结合用浊点 → が"
+  },
+  {
+    "name": "cjk-ideographic-space-trim",
+    "raw": "\u3000你\u3000好\u3000",
+    "unitId": "c_cjk_4",
+    "authorId": "u_4",
+    "expectedClean": "你\u3000好",
+    "expectedHash": "25d763944545ebe0b86781321295a49e95516dfd8963e007c72bd0b150200960",
+    "note": "首尾的 U+3000 去除，行内保留"
+  },
+  {
+    "name": "cjk-mixed-latin",
+    "raw": "用 TypeScript 写代码 123",
+    "unitId": "c_cjk_5",
+    "authorId": "u_5",
+    "expectedClean": "用 TypeScript 写代码 123",
+    "expectedHash": "105a643a95e3718baa1ec6688ed4bab8a182e0e77ed37aaf58a3fa7533f46ad0",
+    "note": "中英混排不改动"
+  }
+]

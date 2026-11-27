@@ -21,7 +21,8 @@
     "check:codeowners": "node tools/ci-checks/src/cli/codeowners.ts",
     "check:links": "node tools/ci-checks/src/cli/links.ts",
     "dev": "docker compose up -d --wait postgres valkey s3 mailpit && docker compose run --rm s3-init",
-    "dev:down": "docker compose down"
+    "dev:down": "docker compose down",
+    "spec:vectors": "pnpm --filter @post-reader/canonical-spec test && python3 -I packages/canonical-spec/scripts/expected_hash.py"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",

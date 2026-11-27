@@ -1,0 +1,56 @@
+[
+  {
+    "name": "zwsp-removed",
+    "raw": "零\u200b宽",
+    "unitId": "c_zero-width_1",
+    "authorId": "u_1",
+    "expectedClean": "零宽",
+    "expectedHash": "4d0b08bf9144d4098d9e41d7185929114b62f33e14233435eb0e0f00a724b35b",
+    "note": "U+200B 删除"
+  },
+  {
+    "name": "bom-start-removed",
+    "raw": "\ufeffhello",
+    "unitId": "c_zero-width_2",
+    "authorId": "u_2",
+    "expectedClean": "hello",
+    "expectedHash": "d097cc97c4cf8ab7895206bbdd607825ff7ac60f4795f4474b337353ff35e9a3",
+    "note": "开头的 BOM 删除"
+  },
+  {
+    "name": "bom-middle-removed",
+    "raw": "a\ufeffb",
+    "unitId": "c_zero-width_3",
+    "authorId": "u_3",
+    "expectedClean": "ab",
+    "expectedHash": "13dbc4fbd000f81da3b1f8245f8766077141fef24f83cb9448c9696b0eb9c4c7",
+    "note": "中间的 U+FEFF 同样删除"
+  },
+  {
+    "name": "word-joiner-removed",
+    "raw": "foo\u2060bar",
+    "unitId": "c_zero-width_4",
+    "authorId": "u_4",
+    "expectedClean": "foobar",
+    "expectedHash": "a4c66b7146a1096ec88b37d3ac8368bfe1b645412d5af55c46cb9c6dc77ab973",
+    "note": "U+2060 删除"
+  },
+  {
+    "name": "zwnj-latin-removed",
+    "raw": "ab\u200ccd",
+    "unitId": "c_zero-width_5",
+    "authorId": "u_5",
+    "expectedClean": "abcd",
+    "expectedHash": "6bddc478e9ed0a078fa55e7792b0063ef4dd7fda4ecfc088adb496367943f247",
+    "note": "非连写文字之间的 ZWNJ 删除"
+  },
+  {
+    "name": "zwnj-cjk-removed",
+    "raw": "中\u200c文",
+    "unitId": "c_zero-width_6",
+    "authorId": "u_6",
+    "expectedClean": "中文",
+    "expectedHash": "a76de23398b6ac98897aa771af741945c630b6881aecc29f0b99fd1b9fe37dae",
+    "note": "汉字不属于连写文字区段"
+  }
+]

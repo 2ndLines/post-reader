@@ -1,0 +1,74 @@
+[
+  {
+    "name": "crlf-to-lf",
+    "raw": "a\r\nb",
+    "unitId": "c_whitespace_1",
+    "authorId": "u_1",
+    "expectedClean": "a\nb",
+    "expectedHash": "c7ecc78b1701b812fe1dd0ec43545c488a4f03bb95a3283a5968235d7f99b8be",
+    "note": "CRLF → LF"
+  },
+  {
+    "name": "lone-cr-to-lf",
+    "raw": "a\rb",
+    "unitId": "c_whitespace_2",
+    "authorId": "u_2",
+    "expectedClean": "a\nb",
+    "expectedHash": "3e7b6aebe50cdc4a2b547ae4ec9c8a63300594955232eedb165d7ab8be1091f4",
+    "note": "Q1：单独的 CR 先转为 LF，不被当作控制字符删除"
+  },
+  {
+    "name": "nel-ls-ps-to-lf",
+    "raw": "a\u0085b\u2028c\u2029d",
+    "unitId": "c_whitespace_3",
+    "authorId": "u_3",
+    "expectedClean": "a\nb\nc\nd",
+    "expectedHash": "1b4e9e3930d902312a73ffa2dad45b65c80fd4db0c4ca9b136eec6984319f535",
+    "note": "NEL、LS、PS → LF"
+  },
+  {
+    "name": "blank-lines-collapsed",
+    "raw": "a\n\n\n\nb",
+    "unitId": "c_whitespace_4",
+    "authorId": "u_4",
+    "expectedClean": "a\n\nb",
+    "expectedHash": "ec1b3d95f4b26a69d7b3205a19960087578cb3fbc58b3a0ed457c790532cfbe2",
+    "note": "连续空行折叠为一个"
+  },
+  {
+    "name": "whitespace-only-lines-become-blank",
+    "raw": "a\n  \n\u3000\n\t\nb",
+    "unitId": "c_whitespace_5",
+    "authorId": "u_5",
+    "expectedClean": "a\n\nb",
+    "expectedHash": "9693df3cb717b7a25b4d7a612ad320d6b479e40fb16357a8b62268c4709ab3af",
+    "note": "只含空白的行视为空行（制表符已在第 3 步删除）"
+  },
+  {
+    "name": "trim-ends",
+    "raw": "\n\n  hello world  \n\n",
+    "unitId": "c_whitespace_6",
+    "authorId": "u_6",
+    "expectedClean": "hello world",
+    "expectedHash": "bf16147d71b3cb5ae20f4fe4835cfbc980b0b6474d8c39cf6719b4f96038c799",
+    "note": "首尾空白与换行去除"
+  },
+  {
+    "name": "tab-deleted",
+    "raw": "a\tb",
+    "unitId": "c_whitespace_7",
+    "authorId": "u_7",
+    "expectedClean": "ab",
+    "expectedHash": "d46a9dd561565787c25a590562cb5a0248b6d69dcde833cded9c9f31936bedca",
+    "note": "Q2：按 00 §3.2 原文删除制表符（待负责人确认）"
+  },
+  {
+    "name": "inner-and-trailing-spaces-kept",
+    "raw": "line1  \nline2   x",
+    "unitId": "c_whitespace_8",
+    "authorId": "u_8",
+    "expectedClean": "line1  \nline2   x",
+    "expectedHash": "cfb669bf4d3529406293c8b8a9adf66264df90828f185150d9d845c1e52a5252",
+    "note": "行内与行尾空白不处理"
+  }
+]
