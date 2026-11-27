@@ -199,7 +199,8 @@ export class AuthService {
    * 刷新并轮换（02 §10.1）。旧 refresh token 被再次使用（含并发重复提交）时吊销整个 family（AUTH_REVOKED）。
    * 用条件 UPDATE 原子地「领取」旧会话：并发请求中只有一个成功，其余都按重用处理。
    */
-  async refresh(refreshToken: string) {
+  /** attestedDeviceId：启用 App Attest 时为通过断言的设备；必须是该会话的设备，否则 ATTEST_REQUIRED */
+  async refresh(refreshToken: string, attestedDeviceId?: string) {
     const { db } = this.#d;
     const now = this.#now();
     const [session] = await db
@@ -212,6 +213,9 @@ export class AuthService {
       throw new AppError('AUTH_REVOKED', 401);
     }
     if (session.expiresAt.getTime() <= now.getTime()) throw new AppError('AUTH_EXPIRED', 401);
+    if (attestedDeviceId !== undefined && session.deviceId !== attestedDeviceId) {
+      throw new AppError('ATTEST_REQUIRED', 403, 'device');
+    }
 
     const claimed = await db
       .update(sessions)

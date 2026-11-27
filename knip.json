@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6.48.0/schema.json",
-  "ignoreBinaries": ["locale"],
+  "ignoreBinaries": ["locale", "openssl"],
   "workspaces": {
     ".": {
       "project": []

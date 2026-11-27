@@ -14,6 +14,8 @@ allowBuilds:
   protobufjs: false
   # drizzle-kit 依赖的 esbuild：安装后自检脚本，V1 实测不需要（ADR 0017）
   esbuild: false
+  # cbor-x 的可选原生加速；cbor-x 在纯 JS 下工作，不需要构建（P2-SRV-07）
+  cbor-extract: false
 
 # 新版本发布满 3 天（单位：分钟）才允许安装（05 §2.5）
 minimumReleaseAge: 4320
