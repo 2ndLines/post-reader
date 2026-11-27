@@ -177,6 +177,17 @@ export class JobsService {
     return job;
   }
 
+  /** WS 订阅前的归属检查 */
+  async owns(userId: string, jobId: string): Promise<boolean> {
+    return this.#owned(userId, jobId).then(
+      () => true,
+      (error: unknown) => {
+        if (error instanceof AppError && error.code === 'NOT_FOUND') return false;
+        throw error;
+      },
+    );
+  }
+
   async get(userId: string, jobId: string) {
     const job = await this.#owned(userId, jobId);
     const [ready] = await this.#d.db
