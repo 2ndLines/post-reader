@@ -1,0 +1,26 @@
+# 额度与限流（02 §11.3、§21、§23；受保护路径，改动需负责人审阅）。schema：packages/config-schema（QuotasConfig）
+reset: calendar_month # users.billing_tz 每月 1 日 0 点（主 PRD U2）
+sharedCacheCharge: by_duration # 主 PRD U3
+lowQuotaWarning: false # 主 PRD U13
+negativeBalance: keep_in_period_no_carryover # 主 PRD U18
+chargeModeration: false # 主 PRD U17
+compensation: # 后台 Q1、Q17
+  maxPerGrantPoints: 60
+  maxDailyPoints: 600 # 每个后台账号每日
+  batchTotalCap: null # 不设
+dailyJobLimit: { uncalibrated: true, source: "《风控与反滥用策略规范》R_daily（主 PRD 1.3）" }
+tokenBuckets:
+  user: { uncalibrated: true, source: "《风控与反滥用策略规范》用户令牌桶容量与速率（02 §11.3）" }
+  ip: { uncalibrated: true, source: "《风控与反滥用策略规范》认证接口 IP 令牌桶（02 §11.3）" }
+emailCode: # 02 §4.2
+  cooldownSeconds: 120 # 每邮箱 1 次 / 120 s
+  verifyMaxAttempts: 5 # 每邮箱 5 次 / 10 min
+  verifyWindowSeconds: 600
+limits: # POST /jobs 服务端校验（02 §4.2）
+  maxComments: 80 # 主帖 + C_batch 上限 80 条评论
+  maxUnitChars: 8000
+postMaxChars: 60000 # 主 PRD U25；正式值由台架标定（TB-COST-06）后经 PR 生效
+postMaxPoints: { free: 15, plus: 30, pro: 60 } # 点，同上
+extendStep: same_as_tier_cap # 每次「继续生成」放宽一档（+ 同档上限）
+billingTz:
+  changeCooldownDays: 30 # 主 PRD U24

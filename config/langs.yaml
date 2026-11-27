@@ -1,0 +1,6 @@
+# 播报语言等级（主 PRD 5.1）。Tier 3 = 不在下表中的其余语种：严格禁止作为目标发音语言，源帖为 Tier 3 时强制译入 Tier 1/2。
+# schema：packages/config-schema（LangsConfig）
+tier1: [zh-CN, zh-TW, en-US, en-GB, ja-JP, ko-KR, es-ES, fr-FR, de-DE] # 神经网络高保真多情绪 TTS
+tier2: [pt-BR, it-IT, ru-RU, id-ID, th-TH, vi-VN, ar-SA] # 标准自然音色，禁用高幅度情绪起伏
+# 系统区域不在 Tier 1/2 中时的默认目标语言（主 PRD 5.2.1 只规定「缺省遵循系统区域设置」；兜底取值为默认，待负责人确认）
+fallbackTargetLang: en-US
