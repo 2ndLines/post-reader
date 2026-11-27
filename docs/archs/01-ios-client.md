@@ -2,11 +2,12 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.3（2026-11-26） |
+| 文档版本 | v1.4（2026-11-27） |
 | 依据 | 主 PRD v2.7 草案（重点：5、6.1、6.3、7、8、9.1、9.4、10.2、10.3、11.2–11.4）；《iOS 客户端 PRD》v1.3；`00-overview.md` |
 | v1.1 变更 | 完整性失败改为跳过单元（§8.4）；后台刷新任务不再预取内容（§14）；新增首次启动钥匙串清理（§15.3）；新增页面与路由（§6）；新增 §22：支持码、投诉、数据导出、诊断上报、版本门控、内置配置包、交易监听、运行时开关处理、审核演示账号 |
 | v1.2 变更 | 新增 §23：设计风格定位、Liquid Glass 两套外观与分层规则、`PRGlassSurface`、App 图标、场景生命周期、测试要求；统一额度池：`GET /me` 的 `quota` 改为毫点字段，新增 `QuotaInfoScreen`，文案「合成时长」改为「额度」 |
 | v1.3 变更 | 新增 §24：章节跳转（`chapter.map`、`seek`、位置语义的 `progress`）、法域策略与同意、设备证明与推送抽象、客户端能力声明；切片缓存不转码以保留标识；§24.6 规格补全：年龄确认、计费时区、单篇上限 |
+| v1.4 变更 | §5.1 token 按冻结原型落地（P4-IOS-02）：圆角改为原型层级 12 / 16 / 24 / 34；增加 `accentOnMuted`、`PRFont.title3`、`caption2`、`PRSize`；字号与 Dynamic Type 文本样式的对应写入 `PRFont` 注释；§5.2 增加实现状态 |
 | 技术基线 | Swift 6 语言模式（strict concurrency）、SwiftUI、部署目标 iOS 18+；用 Xcode 27（iOS 27 SDK）构建，具体小版本以 `.xcode-version` 为准（满足 App Store 上传要求，见 05 §1） |
 | 视觉基线 | PRD 7.3 冻结原型 `prototype/ios-app`（tag `prototype-frozen-2026-11-23`）、`prototype/ios-app/DESIGN.md`、`docs/ios_ui_freeze.md`；iOS 26+ 的 Liquid Glass 适配见 §23 |
 
@@ -230,7 +231,7 @@ public enum PRFont {           // 全部基于 Dynamic Type 文本样式
   public static let mono: Font // 验证码、调试信息
 }
 public enum PRSpace { public static let xxs = 2.0, xs = 4.0, s = 8.0, m = 12.0, l = 16.0, xl = 24.0, xxl = 32.0 }
-public enum PRRadius { public static let s = 8.0, m = 12.0, l = 16.0, sheet = 20.0 }
+public enum PRRadius { public static let s = 12.0, m = 16.0, l = 24.0, sheet = 34.0 } // 冻结原型：小块 / 内嵌块 / 卡片 / 弹层
 public enum PRMotion { public static let quick = 0.15, standard = 0.25, emphasized = 0.35 } // 秒；尊重“减弱动态效果”
 public enum PRIcon { /* SF Symbols 名称常量，避免散落字符串 */ }
 ```
@@ -271,6 +272,8 @@ public enum PRIcon { /* SF Symbols 名称常量，避免散落字符串 */ }
 | `PRPrivacyNotice` | 登录首屏说明 | — | | PRD 7.1 要求说明云端配额账本与加密同步 |
 
 组件放在 `DesignSystem/Sources/Components/<Name>/`，每个组件一个文件 + 一个 `#Preview` + 一个快照测试。悬浮在内容之上的组件使用 `PRGlassSurface` 取材质（§23.4）。
+
+实现状态（P4-IOS-02）：已实现 `PRButton`、`PRIconButton`、`PRCountdownButton`、`PRTextField`、`PRCodeField`（登录所需）；其余组件随首页、播放与设置的任务卡实现。快照参考图位于 `DesignSystem/Tests/DesignSystemTests/__Snapshots__/`。
 
 ### 5.3 交互与可访问性规则
 
