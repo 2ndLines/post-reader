@@ -64,6 +64,7 @@
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
 | [P4-IOS-01](P4-IOS-01.md) | XcodeGen 工程、SPM 包骨架、xcconfig、能力、SwiftLint / SwiftFormat、`make`、Xcode Cloud 脚本 | P1-IOS-01 | Q1（Bundle ID、Team ID、D1）、Q2（lint 不在构建阶段）、Q3（iOS 18 模拟器）；Xcode Cloud 工作流需 Apple 账号 | PR 待审阅 |
+| [P4-IOS-02](P4-IOS-02.md) | DesignSystem 第一部分：token（取自冻结原型）与登录组件 5 个，快照 30 张 | IOS-01 | Q1（正文字号）、Q2（发言人色带）、Q3（iOS 18 快照）；视觉确认 | 第一部分 PR 待审阅 |
 
 ## 之后
 
