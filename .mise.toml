@@ -1,0 +1,11 @@
+# 工具版本的唯一来源（05 §2.4、§5.1）。.nvmrc 必须与 node 版本保持一致。
+[tools]
+node = "26.13.1"
+pnpm = "12.23.0"
+gitleaks = "8.30.1"
+gh = "2.103.3"
+
+# 默认关闭遥测（05 §2.6）
+[env]
+DO_NOT_TRACK = "1"
+TURBO_TELEMETRY_DISABLED = "1"

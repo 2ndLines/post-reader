@@ -1,0 +1,26 @@
+{
+  "$schema": "./node_modules/turbo/schema.json",
+  "ui": "stream",
+  "remoteCache": {
+    "enabled": false
+  },
+  "globalDependencies": [".mise.toml", "packages/tooling/tsconfig.base.json"],
+  "tasks": {
+    "//#lint": {
+      "inputs": ["$TURBO_DEFAULT$", "!docs/**/*.bundle"]
+    },
+    "typecheck": {
+      "dependsOn": ["^typecheck"]
+    },
+    "test": {
+      "outputs": ["coverage/**"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "verify": {
+      "dependsOn": ["//#lint", "typecheck", "test"]
+    }
+  }
+}

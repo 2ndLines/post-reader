@@ -1,0 +1,13 @@
+packages:
+  - apps/*
+  - apps/testbench/*
+  - packages/*
+  - tools/*
+
+# 只允许列出的依赖运行安装脚本（pnpm 11 起取代 onlyBuiltDependencies）；新增需在 PR 中说明原因
+allowBuilds: {}
+
+# 新版本发布满 3 天（单位：分钟）才允许安装（05 §2.5）
+minimumReleaseAge: 4320
+
+strictPeerDependencies: true
