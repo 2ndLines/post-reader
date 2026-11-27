@@ -31,7 +31,13 @@ export interface Readiness {
   ready: boolean;
 }
 
-function sendProblem(reply: FastifyReply, status: number, code: ErrorCode, detail?: string) {
+function sendProblem(
+  reply: FastifyReply,
+  status: number,
+  code: ErrorCode,
+  detail?: string,
+  resetAt?: string,
+) {
   const body = {
     type: 'about:blank',
     title: TITLES[code] ?? code,
@@ -39,6 +45,7 @@ function sendProblem(reply: FastifyReply, status: number, code: ErrorCode, detai
     code,
     traceId: reply.request.id,
     ...(detail ? { detail } : {}),
+    ...(resetAt ? { resetAt } : {}),
   };
   return reply.status(status).type(PROBLEM_CONTENT_TYPE).send(JSON.stringify(body));
 }
@@ -83,7 +90,7 @@ export async function buildApp(options: { logger: Logger; readiness: Readiness }
     if (error instanceof RateLimitError)
       reply.header('retry-after', String(error.retryAfterSeconds));
     if (error instanceof AppError)
-      return sendProblem(reply, error.status, error.code, error.detail);
+      return sendProblem(reply, error.status, error.code, error.detail, error.resetAt);
     if (error instanceof RequestValidationError) {
       return sendProblem(reply, 400, 'VALIDATION_FAILED', `字段：${error.paths.join(', ')}`);
     }

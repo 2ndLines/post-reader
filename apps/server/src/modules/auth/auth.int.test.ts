@@ -7,11 +7,6 @@ import { eq } from 'drizzle-orm';
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { decryptField } from '../../platform/crypto/field.ts';
-import {
-  computeSignature,
-  parseQueryPairs,
-  stringToSign,
-} from '../../platform/crypto/request-signature.ts';
 import { createTestDatabase } from '../../platform/db/test-database.ts';
 import { buildApp } from '../../platform/http/app.ts';
 import { DekCache } from '../../platform/kms/dek-cache.ts';
@@ -24,6 +19,7 @@ import { authRoutes, requireAuth } from './routes.ts';
 import { authIdentities, sessions, users } from './schema.ts';
 import { AuthService } from './service.ts';
 import { requireSignature } from './signature-guard.ts';
+import { type Session, signedHeaders } from './signing-client.ts';
 
 const BUNDLE_ID = 'com.example.postreader';
 const prefix = `test:${randomBytes(4).toString('hex')}:`;
@@ -121,35 +117,6 @@ afterAll(async () => {
 
 const post = (url: string, payload: unknown, headers: Record<string, string> = {}) =>
   app.inject({ method: 'POST', url: `/v1${url}`, payload: payload as object, headers });
-
-type Session = { accessToken: string; sessionKey: string };
-
-/** 客户端签名（与 iOS SigningMiddleware 相同的算法；本实现已对独立的 Python 黄金向量验证过） */
-function signedHeaders(
-  session: Session,
-  method: string,
-  url: string,
-  body: string,
-  overrides: Partial<{ ts: string; nonce: string; key: Uint8Array }> = {},
-) {
-  const ts = overrides.ts ?? String(Date.now());
-  const nonce = overrides.nonce ?? randomBytes(8).toString('hex');
-  const q = url.indexOf('?');
-  const sts = stringToSign({
-    method,
-    path: q === -1 ? url : url.slice(0, q),
-    query: parseQueryPairs(url),
-    ts,
-    nonce,
-    rawBody: new TextEncoder().encode(body),
-  });
-  return {
-    authorization: `Bearer ${session.accessToken}`,
-    'x-ts': ts,
-    'x-nonce': nonce,
-    'x-sig': computeSignature(overrides.key ?? Buffer.from(session.sessionKey, 'base64'), sts),
-  };
-}
 
 const logout = (session: Session, overrides = {}) =>
   app.inject({

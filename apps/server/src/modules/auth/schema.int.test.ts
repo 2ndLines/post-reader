@@ -35,16 +35,12 @@ async function pgError(promise: Promise<unknown>): Promise<string | undefined> {
 }
 
 describe('身份与会话表（迁移 0000_identity）', () => {
-  it('迁移建出 5 张表；重复执行迁移不报错（幂等）', async () => {
+  it('迁移建出身份相关的 5 张表（其他模块的表由各自的测试检查）；重复执行迁移不报错（幂等）', async () => {
     const rows = await t.sql<{ table_name: string }[]>`
       select table_name from information_schema.tables where table_schema = 'public' order by table_name`;
-    expect(rows.map((r) => r.table_name)).toEqual([
-      'auth_identities',
-      'devices',
-      'sessions',
-      'user_keys',
-      'users',
-    ]);
+    expect(rows.map((r) => r.table_name)).toEqual(
+      expect.arrayContaining(['auth_identities', 'devices', 'sessions', 'user_keys', 'users']),
+    );
     await expect(runMigrations(t.url)).resolves.toBeUndefined();
   });
 
