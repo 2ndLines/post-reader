@@ -24,7 +24,7 @@
     },
     "test:int": {
       "cache": false,
-      "passThroughEnv": ["TEST_DATABASE_URL"]
+      "passThroughEnv": ["TEST_DATABASE_URL", "TEST_REDIS_URL"]
     }
   }
 }

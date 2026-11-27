@@ -38,7 +38,7 @@ describe('checkToolVersions', () => {
     expect(errors.join('\n')).toMatch(/GITLEAKS_VERSION（8\.29\.0）/);
   });
 
-  it('工作流中的 postgres 镜像必须与 docker-compose.yml 一致', () => {
+  it('工作流中与 docker-compose.yml 同仓库的镜像必须完全一致（含 digest）', () => {
     const compose = 'services:\n  postgres:\n    image: postgres:18.7@sha256:aaa\n';
     const ok = {
       file: 'int.yml',
@@ -52,6 +52,22 @@ describe('checkToolVersions', () => {
     expect(checkToolVersions({ ...good, compose, workflows: [...good.workflows, bad] })).toEqual([
       'int.yml 中的 postgres:18.6@sha256:bbb 与 docker-compose.yml 的 postgres:18.7@sha256:aaa 不一致',
     ]);
+    const valkeyCompose = `${compose}  valkey:\n    image: valkey/valkey:8.1.12@sha256:ccc\n`;
+    const valkeyBad = {
+      file: 'int.yml',
+      content: '      valkey:\n        image: valkey/valkey:8.1.11@sha256:ddd\n',
+    };
+    expect(checkToolVersions({ ...good, compose: valkeyCompose, workflows: [valkeyBad] })).toEqual([
+      'int.yml 中的 valkey/valkey:8.1.11@sha256:ddd 与 docker-compose.yml 的 valkey/valkey:8.1.12@sha256:ccc 不一致',
+    ]);
+    // compose 中没有的镜像（例如别的工具）不受约束
+    expect(
+      checkToolVersions({
+        ...good,
+        compose,
+        workflows: [{ file: 'x.yml', content: '    image: alpine:3\n' }],
+      }),
+    ).toEqual([]);
   });
 
   it('.mise.toml 缺项时报告缺失，而不是静默通过', () => {
