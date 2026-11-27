@@ -1,4 +1,4 @@
-# P4-IOS-02 DesignSystem（第一部分：token 与登录组件）
+# P4-IOS-02 DesignSystem（token、登录组件、首页与播放组件）
 
 ## 目标
 P4-IOS-02 的完整交付物是 DesignSystem：token，以及 01 §5.2 中登录、首页、播放所需的组件，每个组件带预览与快照测试。本卡完成其中两项：
@@ -83,3 +83,20 @@ P4-IOS-02 的完整交付物是 DesignSystem：token，以及 01 §5.2 中登录
 - **需真机验证**：验证码自动填充（R1）。
 - **人工检查点**：负责人对照冻结原型确认视觉（playbook §6.6），参考图在 `__Snapshots__/` 中。
 - **下一步**：第二部分（首页与播放组件），或 P4-IOS-03（Storage）。
+
+## 第二部分：首页与播放组件（2026-11-27）
+- **组件**：
+  - `PRSegmentedTabs`：首页「推荐 / 收藏」
+  - `PRPostCard`：显示数据为 `PostCardModel`，**不含任何计数**；状态 default / playing / capturing / needsSiteLogin / failed；有图片 +N、视频时长、「样帖试听」斜角标
+  - `PRMiniPlayer`：playing / paused / buffering，本机语音标签，没有下一篇时禁用
+  - `PRSpeakerChip`：槽位超出色带长度时循环取色
+  - `PRProgressScrubber`：按章节分段；可访问性上为可调节元素，按章节跳转
+  - `PRPlayerControls`：首位时上一篇禁用，显示倍速
+- **视觉出处**：原型 `post-card.tsx`（卡片布局、缩略图 80×60、圆角 12、斜角标）、`ios-device-viewport.tsx`（迷你播放条高 56 的胶囊）、`home-screen.tsx`（标签 22 / 28 粗体，未选中 60%）。
+- **原型没有的状态**：卡片的 playing / capturing / failed 状态与播放页控件的布局，原型都没有给出。目前按系统惯例实现：图标加文字、强调色或危险色，待视觉确认（Q5）。
+- **测试**：
+  - 快照新增 36 张，共 66 张，连续两次运行一致；全量重新录制后，第一部分的 30 张没有变化。
+  - 逻辑测试新增 1 条：进度条的当前章节计算。
+- **修正**：卡片摘要在只给理想尺寸的布局中只显示一行，已加 `fixedSize(vertical:)`。
+- **Q5 待负责人确认**：卡片 playing / capturing / failed 三种状态的样式；播放页控件的布局（原型的播放页不在本次范围内对照）。
+- **R2**：迷你播放条在深色模式下用系统材质，与背景的对比较弱。`PRGlassSurface` 实现时一并处理。

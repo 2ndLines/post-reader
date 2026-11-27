@@ -44,7 +44,7 @@
 | [P2-SRV-06](P2-SRV-06.md) | 请求签名中间件与重放测试（与 iOS 共用的黄金向量） | SRV-05 | Q1（规范化查询串）、Q2（时间窗的错误码） | 已合并（2026-11-27） |
 | [P2-SRV-07](P2-SRV-07.md) | App Attest：证明登记、断言校验，`/auth/refresh` 要求设备证明 | SRV-05 | Q1（合成测试数据）、Q2（clientData 格式） | 已合并（2026-11-27） |
 | [P2-SRV-08](P2-SRV-08.md) | 厂商 Mock 服务：回放、录制（需授权）、延迟 / 错误 / 挂起 / 断开注入 | SRV-01 | Q1（是否进 compose）、Q2（02 §15 的目录位置） | 已合并（2026-11-27） |
-| [P2-SRV-09](P2-SRV-09.md) | 频控挂载：认证接口的 IP 令牌桶、`/auth/refresh` 的用户令牌桶（补齐 P2 出口条件） | SRV-03、SRV-05 | Q1（非生产环境的未标定桶）、Q2（trustProxy）、Q3（`Retry-After`） | PR 待审阅 |
+| [P2-SRV-09](P2-SRV-09.md) | 频控挂载：认证接口的 IP 令牌桶、`/auth/refresh` 的用户令牌桶（补齐 P2 出口条件） | SRV-03、SRV-05 | Q1（非生产环境的未标定桶）、Q2（trustProxy）、Q3（`Retry-After`） | 已合并（2026-11-27） |
 
 ## P3 · 同语种流水线、海外预发、台架雏形
 
@@ -52,10 +52,10 @@
 
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
-| [P3-SRV-01](P3-SRV-01.md) | `jobs`：表、状态机、`POST /jobs`（摘要重算、幂等、预检）、查询与取消、事件流 | SRV-05–09 | Q1–Q7（幂等键规则、状态码等默认值） | PR 待审阅 |
-| [P3-SRV-02](P3-SRV-02.md) | WebSocket 网关：`hello` 鉴权、订阅与 `resume`、上行写入、背压、停机前 `reconnect` | SRV-01（P3） | Q1（`hello` 签名串）、Q2（关闭码）、R2（事件流保留窗口） | PR 待审阅 |
-| [P3-SRV-04](P3-SRV-04.md) | `quota`：两层计量、`settleCall` 原子核销、退还、软着陆 | SRV-01（P3） | Q1（容错等价用量由调用方提供）、Q2（无账期时拒绝结算）；系数与单价待标定 | PR 待审阅 |
-| [P3-PIPE-02](P3-PIPE-02.md) | 分支 A 第一部分：音色分配、`select` 校验与降级、TTS 输入规范化与切句（纯函数） | — | Q1（音色约束改为整篇检查）；第二部分等 LLM 厂商与语种识别库 | 第一部分 PR 待审阅 |
+| [P3-SRV-01](P3-SRV-01.md) | `jobs`：表、状态机、`POST /jobs`（摘要重算、幂等、预检）、查询与取消、事件流 | SRV-05–09 | Q1–Q7（幂等键规则、状态码等默认值） | 已合并（2026-11-27） |
+| [P3-SRV-02](P3-SRV-02.md) | WebSocket 网关：`hello` 鉴权、订阅与 `resume`、上行写入、背压、停机前 `reconnect` | SRV-01（P3） | Q1（`hello` 签名串）、Q2（关闭码）、R2（事件流保留窗口） | 已合并（2026-11-27） |
+| [P3-SRV-04](P3-SRV-04.md) | `quota`：两层计量、`settleCall` 原子核销、退还、软着陆 | SRV-01（P3） | Q1（容错等价用量由调用方提供）、Q2（无账期时拒绝结算）；系数与单价待标定 | 已合并（2026-11-27） |
+| [P3-PIPE-02](P3-PIPE-02.md) | 分支 A 第一部分：音色分配、`select` 校验与降级、TTS 输入规范化与切句（纯函数） | — | Q1（音色约束改为整篇检查）；第二部分等 LLM 厂商与语种识别库 | 第一部分已合并（2026-11-27） |
 
 ## P4 · iOS 基座（可与 P2、P3 并行）
 
@@ -63,8 +63,8 @@
 
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
-| [P4-IOS-01](P4-IOS-01.md) | XcodeGen 工程、SPM 包骨架、xcconfig、能力、SwiftLint / SwiftFormat、`make`、Xcode Cloud 脚本 | P1-IOS-01 | Q1（Bundle ID、Team ID、D1）、Q2（lint 不在构建阶段）、Q3（iOS 18 模拟器）；Xcode Cloud 工作流需 Apple 账号 | PR 待审阅 |
-| [P4-IOS-02](P4-IOS-02.md) | DesignSystem 第一部分：token（取自冻结原型）与登录组件 5 个，快照 30 张 | IOS-01 | Q1（正文字号）、Q2（发言人色带）、Q3（iOS 18 快照）；视觉确认 | 第一部分 PR 待审阅 |
+| [P4-IOS-01](P4-IOS-01.md) | XcodeGen 工程、SPM 包骨架、xcconfig、能力、SwiftLint / SwiftFormat、`make`、Xcode Cloud 脚本 | P1-IOS-01 | Q1（Bundle ID、Team ID、D1）、Q2（lint 不在构建阶段）、Q3（iOS 18 模拟器）；Xcode Cloud 工作流需 Apple 账号 | 已合并（2026-11-27） |
+| [P4-IOS-02](P4-IOS-02.md) | DesignSystem：token（取自冻结原型）、登录组件 5 个、首页与播放组件 6 个，快照 66 张 | IOS-01 | Q1（正文字号）、Q2（发言人色带）、Q3（iOS 18 快照）、Q5（原型没有的状态）；视觉确认 | 第一部分已合并（#29）；第二部分 PR 待审阅 |
 
 ## 之后
 

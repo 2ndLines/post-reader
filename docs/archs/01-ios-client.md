@@ -273,7 +273,7 @@ public enum PRIcon { /* SF Symbols 名称常量，避免散落字符串 */ }
 
 组件放在 `DesignSystem/Sources/Components/<Name>/`，每个组件一个文件 + 一个 `#Preview` + 一个快照测试。悬浮在内容之上的组件使用 `PRGlassSurface` 取材质（§23.4）。
 
-实现状态（P4-IOS-02）：已实现 `PRButton`、`PRIconButton`、`PRCountdownButton`、`PRTextField`、`PRCodeField`（登录所需）；其余组件随首页、播放与设置的任务卡实现。快照参考图位于 `DesignSystem/Tests/DesignSystemTests/__Snapshots__/`。
+实现状态（P4-IOS-02）：已实现登录所需的 `PRButton`、`PRIconButton`、`PRCountdownButton`、`PRTextField`、`PRCodeField`，以及首页与播放所需的 `PRSegmentedTabs`、`PRPostCard`、`PRMiniPlayer`、`PRSpeakerChip`、`PRProgressScrubber`、`PRPlayerControls`；其余组件随设置、订阅、配额等任务卡实现。`PRMiniPlayer` 的材质暂用系统 `regularMaterial`，`PRGlassSurface`（§23.4）实现后替换。快照参考图位于 `DesignSystem/Tests/DesignSystemTests/__Snapshots__/`。
 
 ### 5.3 交互与可访问性规则
 

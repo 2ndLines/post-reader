@@ -25,4 +25,15 @@ struct LogicTests {
         #expect(CodeInput.sanitize("１２３", length: 6) == "")
         #expect(CodeInput.sanitize("", length: 6) == "")
     }
+
+    @Test("进度条：当前章节按累计时长计算，超出总长取最后一章")
+    @MainActor
+    func scrubberChapter() {
+        let chapters: [PRProgressScrubber.Chapter] = [.init(id: "a", durationMs: 10), .init(id: "b", durationMs: 20)]
+        let at = { (ms: Int) in PRProgressScrubber(chapters: chapters, positionMs: ms) { _ in }.currentChapterIndex }
+        #expect(at(0) == 0)
+        #expect(at(9) == 0)
+        #expect(at(10) == 1)
+        #expect(at(999) == 1)
+    }
 }
