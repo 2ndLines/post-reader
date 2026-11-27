@@ -1,0 +1,23 @@
+# 本地 git 钩子（05 §4.1；任务卡 P0-REPO-03）。工具一律经 mise 运行，版本与 .mise.toml 一致。
+# 钩子由 `pnpm i` 时的 prepare 脚本安装；CI 中设置 LEFTHOOK=0 跳过。
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      glob: "*.{js,mjs,cjs,ts,mts,cts,json,jsonc}"
+      run: mise exec -- pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+
+    - name: gitleaks
+      run: mise exec -- gitleaks git --pre-commit --staged --redact --no-banner --exit-code 1
+
+    - name: typecheck
+      glob: "*.{ts,mts,cts}"
+      # 只检查有未提交改动的包及其依赖方
+      run: mise exec -- pnpm exec turbo run typecheck --filter='...[HEAD]' --output-logs=errors-only
+
+pre-push:
+  jobs:
+    - name: verify
+      # verify 检查整个仓库；显式给出文件列表，避免首次推送新分支时 lefthook 因「无推送文件」而跳过
+      files: git ls-files
+      run: mise exec -- pnpm verify
