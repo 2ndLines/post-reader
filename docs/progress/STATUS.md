@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-26（P0 全部实现；P1-SPEC-01、P1-IOS-01、P1-CTR-01 实现，PR 待审阅）
+最后更新：2026-11-26（P0 全部实现；P1-SPEC-01、P1-IOS-01、P1-CTR-01、P1-CTR-03 实现，PR 待审阅）
 
 ## 当前阶段
 P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：P1-SPEC-01（草案）与 P1-IOS-01 已实现，TS 与 Swift 两侧 51 条黄金向量全部通过。合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P1-CTR-03：WebSocket 上行与下行消息契约（与 00 §3.1 自动比对），兼容规则测试（未知 `t` 忽略、多出的字段丢弃、`protocol` 校验）
 - P1-CTR-01：`packages/contracts` 的基础枚举（与 00 §3.1 表格自动比对）、`CanonicalPost`、`ErrorCode`、problem+json
 - P1-IOS-01：`apps/ios/Packages/ReaderCore`（Swift 6，只依赖 Foundation 与 CryptoKit），51 条向量在 macOS 宿主机与 iOS 27.2 模拟器上全部通过
 - P1-SPEC-01：`packages/canonical-spec` 的 SPEC.md（草案）、TS 参考实现、7 类 51 条黄金向量（摘要由独立的 Python 实现计算）
