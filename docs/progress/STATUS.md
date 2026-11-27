@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-27（#1–#22 已由负责人合并到 main：P0、P1 全部与 P2-SRV-01 至 08；P2-SRV-09、P3-SRV-01、P3-SRV-02、P3-SRV-04、P3-PIPE-02 第一部分、P4-IOS-01、P4-IOS-02 第一部分 PR 待审阅）
+最后更新：2026-11-27（#1–#22 已由负责人合并到 main：P0、P1 全部与 P2-SRV-01 至 08；P2-SRV-09、P3-SRV-01、P3-SRV-02、P3-SRV-04、P3-PIPE-02 第一部分、P4-IOS-01、P4-IOS-02 两部分 PR 待审阅）
 
 ## 当前阶段
 P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 张卡全部实现。P1 出口条件的两项都已满足：TS 与 Swift 两侧 51 条黄金向量全部通过；`openapi.yaml` 生成的 Swift 客户端能编译（V3）。P1-CTR-04 中有 10 项参数尚未标定（`pnpm check:config` 会逐项列出），需负责人提供；在此之前生产模式拒绝加载。合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P4-IOS-02 第二部分：首页与播放组件 6 个（帖子卡片不显示任何计数）；快照共 66 张，连续两次运行一致
 - P4-IOS-02 第一部分：DesignSystem token（颜色、字号、圆角取自冻结原型）与登录组件 5 个；快照 30 张（深浅色 × 3 档字体），连续两次运行一致；01 升到 v1.4
 - P4-IOS-01：iOS 工程基座：XcodeGen 工程、10 个 SPM 包骨架（依赖方向按 01 §3）、xcconfig 与能力、SwiftLint / SwiftFormat、`make project/lint/build/test`；iOS 27.2 模拟器上构建与测试通过（含启动冒烟与 51 组黄金向量）
 - P3-PIPE-02 第一部分：音色分配（整篇冲突图，300 个随机脚本相邻同色为 0）、`select` 输出校验与降级、TTS 输入规范化与切句；LLM 与语种识别部分等厂商
@@ -40,7 +41,7 @@ P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 �
 - 规格补全：计费时区、单篇上限、18+、可用性与恢复目标、首发店面
 
 ## 进行中
-- P2-SRV-09 PR 待审阅（base 为 `main`）；P3-SRV-01、P3-SRV-02、P3-SRV-04、P3-PIPE-02、P4-IOS-01、P4-IOS-02 依次叠在其上
+- P2-SRV-09 PR 待审阅（base 为 `main`）；P3-SRV-01、P3-SRV-02、P3-SRV-04、P3-PIPE-02、P4-IOS-01、P4-IOS-02 两部分依次叠在其上
 - 仍需负责人操作的验收：CI-01 AC4、REPO-03 AC2（都依赖规则集）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5，见下方待办第 3 项
 
 ## 阻塞
@@ -48,7 +49,7 @@ P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 �
 - 海外模型与 TTS 零留存（ZDR）合同未申请
 
 ## 负责人待办（按顺序）
-1. 审阅并合并 P2-SRV-09 的 PR（#23），再依次合并 P3-SRV-01、P3-SRV-02、P3-SRV-04、P3-PIPE-02、P4-IOS-01、P4-IOS-02（#1–#22 已于 2026-11-27 合并）
+1. 审阅并合并 P2-SRV-09 的 PR（#23），再依次合并 P3-SRV-01、P3-SRV-02、P3-SRV-04、P3-PIPE-02、P4-IOS-01、P4-IOS-02 两部分（#1–#22 已于 2026-11-27 合并）
 2. 决定助手推送与提 PR 的身份（机器用户或 GitHub App），然后开启 `main` 规则集（docs/progress/github-settings.md）
 3. 补做需要你操作的验收：CI-01 AC4（向 `main` 直推被拒）、REPO-03 AC2（Code Owner 自动请求审阅）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5（两区 KMS 只读 API 复核，命令见 ADR 0018）
 4. 创建只读的 fine-grained PAT，并在本机设置 `GITHUB_MCP_TOKEN`（`.mcp.json` 中的 github MCP 用）
