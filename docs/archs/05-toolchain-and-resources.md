@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.7（2026-11-26） |
+| 文档版本 | v1.8（2026-11-26） |
 | v1.1 变更 | Xcode 27 构建基线；新增 VisionKit；说明 iOS 27 SDK 忽略 `UIDesignRequiresCompatibility`、快照覆盖 iOS 18 与 iOS 27 的原因；依据改为主 PRD v2.7 草案 |
 | v1.2 变更 | 新增 §3.8 Cloudflare 边缘与存储、§11 长远方案登记（Hono、Wrangler、AudioSeal、C2PA 等）；国内 Redis 改为开源版 7.0，海外对象存储改为 R2 |
+| v1.8 变更 | P2-SRV-01：`fastify-type-provider-zod` 暂不使用；OTel 改为按需插桩；`protobufjs` 安装脚本禁用 |
 | v1.7 变更 | P1-CTR-02：V3 已验证；`zod-to-openapi` 状态改为已定，`yaml`、swift-openapi 三件套提前到 P1 |
 | v1.6 变更 | P0-REPO-04：§6.6 补充 hooks 的实现约束（失败即关闭、变量写法、依赖 jq、只拦截文件工具）；附录 E 改为以仓库 `.claude/` 为准并列出差异 |
 | v1.5 变更 | P0-REPO-05：§1.2 V1、V4、V5 已验证（ADR 0017、0018）；§5.1 pulumi 提前固定 |
@@ -342,7 +343,7 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 | 库 | 用途 | 阶段 | 状态 | 使用规范 |
 | --- | --- | --- | --- | --- |
 | `fastify` | HTTP 框架 | P2 | 已定 | 插件与钩子顺序按 `02-backend.md` §4.1；不使用装饰器之外的全局状态 |
-| `fastify-type-provider-zod` | 路由类型与校验 | P2 | 已定 | 请求与响应都声明 schema；响应 schema 同时起到字段白名单作用 |
+| `fastify-type-provider-zod` | 路由类型与校验 | P2 | **暂不使用（P2-SRV-01 Q1，待负责人确认）** | v7 把 `@fastify/swagger`、`openapi-types` 列为必需的 peer，会引入未登记的依赖；改为在 `platform/http/zod.ts` 中自写约 30 行的校验器与序列化器，规则不变：请求与响应都声明 schema，响应 schema 同时起到字段白名单作用 |
 | `@fastify/websocket` | WS 网关 | P3 | 已定 | 消息必须过 `contracts` 中的判别联合解析；未知 `t` 关闭连接 |
 | `@fastify/helmet` | 安全头 | P2 | 已定 | `admin-api` 额外收紧 CSP |
 | `@fastify/cors` | 仅 `admin-api` | P9 | 已定 | 只允许本区后台域名；`bff` 不开 CORS |
@@ -362,7 +363,7 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 | `ws` | TTS 厂商的 WebSocket 流式协议 | P3 | 已定 | 只在 TTS 适配器；心跳与超时在适配器内处理 |
 | `p-limit` | 并发控制 | P3 | 已定 | 并发上限来自配置 |
 | `pino` | 结构化日志 | P2 | 已定 | `redact` 覆盖 `req.headers.authorization`、`*.cookie`、`*.email`、`*.text`、`*.url`；正文字段不得进入日志对象 |
-| `@opentelemetry/sdk-node`、`@opentelemetry/auto-instrumentations-node` | 追踪与指标 | P2 | 已定 | 关闭会记录 SQL 参数、HTTP 请求体或 URL 查询串的选项；span 属性不含用户数据 |
+| `@opentelemetry/sdk-node`、按需的 `@opentelemetry/instrumentation-*` | 追踪与指标 | P2 | 已定（不用 `auto-instrumentations-node`，P2-SRV-01 Q2） | `auto-instrumentations-node` 经 GCP 资源探测器带入 BlueOak 许可证的包，许可证策略待定（ADR 0017 约束 6），因此只安装用到的插桩（P2-SRV-01 为 http、pino；数据库与 Redis 的插桩随各自的卡加入）。关闭会记录 SQL 参数、HTTP 请求体或 URL 查询串的选项；span 属性不含用户数据 |
 | `@sentry/node` | 错误上报 | P3 | 已定 | `sendDefaultPii: false`；`beforeSend` 删除请求体、查询串、Cookie；国内 DSN 指向自建实例 |
 | `uuid` | UUIDv7 | P2 | 已定 | 数据库侧默认值用 PG 18 的 `uuidv7()`，应用侧需要预生成时用本库 |
 | `testcontainers` | 集成测试 | P2 | 已定 | 镜像与 §3.2 同一 digest |

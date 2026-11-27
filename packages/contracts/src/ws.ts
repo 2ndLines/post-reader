@@ -156,7 +156,10 @@ export function parseServerMsg(data: unknown): ParseResult<ServerMsg> {
   return parseWith(ServerMsg, SERVER_TYPES, data);
 }
 
-/** 服务端解析上行消息：未知类型同样忽略（新客户端连到旧服务端） */
+/**
+ * 服务端解析上行消息。未知类型归为 ignored，由网关决定处理方式：05 §4.2 规定 bff 遇到未知 `t` 关闭连接
+ * （与客户端「忽略未知下行」的规则不同）。
+ */
 export function parseClientMsg(data: unknown): ParseResult<ClientMsg> {
   return parseWith(ClientMsg, CLIENT_TYPES, data);
 }

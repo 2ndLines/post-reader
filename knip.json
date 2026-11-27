@@ -24,6 +24,10 @@
     "packages/config-schema": {
       "entry": ["src/**/*.test.ts", "scripts/*.ts"],
       "project": ["**/*.ts"]
+    },
+    "apps/server": {
+      "entry": ["src/entry/*.ts", "src/**/*.test.ts"],
+      "project": ["**/*.ts"]
     }
   }
 }

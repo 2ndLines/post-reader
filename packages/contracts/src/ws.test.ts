@@ -119,7 +119,7 @@ describe('兼容规则', () => {
     });
   });
 
-  it('服务端遇到未知上行 t：同样忽略（新客户端连到旧服务端）', () => {
+  it('未知上行 t 归为 ignored（网关据此关闭连接，05 §4.2）', () => {
     expect(parseClientMsg({ t: 'like', jobId: 'j1' }).kind).toBe('ignored');
   });
 
