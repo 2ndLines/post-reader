@@ -997,7 +997,7 @@ enum AppError: Error, Equatable {
 | `VersionGate` | 合并 `GET /me` 返回的 `minSupportedVersion`、`recommendedVersion` 与 426 `CLIENT_TOO_OLD`，输出 `.ok` / `.recommend(version)` / `.forced` | `AccountService`、`ClientVersionMiddleware` | IOS-VER-01、02 |
 | `RuntimeFlagHandler` | 读取 `GET /me` 的 `flags` 与错误码 `SERVICE_PAUSED`、`BRANCH_DISABLED`、`SITE_RULE_DISABLED`，驱动横幅与降级路径（§22.4） | `AccountService`、`PlaybackCoordinator` | IOS-OFF-04、05 |
 
-`ConfigService` 增加内置配置包：App 资源中带一份已签名的 `config-bundle.signed`；本地没有已启用的配置包时先验签后导入。所有配置包启用前检查 `minClientVersion`，不满足则保留上一版（IOS-VER-03、04）。
+`ConfigService` 增加内置配置包：App 资源中带一份已签名的 `config-bundle.signed`；本地没有已启用的配置包时先验签后导入。验签按信封中的 `kid` 选取本区登记的公钥，并要求其 `alg` 一致：海外区 Ed25519（`Curve25519.Signing`），国内区 ECDSA P-256（`P256.Signing`，P1363 原始格式）（ADR 0018）。所有配置包启用前检查 `minClientVersion`，不满足则保留上一版（IOS-VER-03、04）。
 
 ### 22.2 使用的服务端接口（新增部分）
 

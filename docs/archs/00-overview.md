@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.3（2026-11-26） |
+| 文档版本 | v1.4（2026-11-26） |
 | v1.1 变更 | 新增 05 文档索引；待决策项 D9–D16（D16：未决事项一律取各表「未决前的默认」）；`ErrorCode` 增加 `DAILY_LIMIT`、`AUTH_REVOKED`、`SERVICE_PAUSED`、`BRANCH_DISABLED`、`SITE_RULE_DISABLED`；`config/` 补齐 `clients`、`regions`、`privacy`、`ops`、`review-accounts`、`vendors/pricing`；依据改为主 PRD v2.7 草案与三份子 PRD；新增 `config/credit-rates/<region>.yaml`（统一额度池费率系数）与 `vendors/pricing/<region>.yaml`（渠道单价），`quota.update` 改为 `remainingMc` |
 | v1.2 变更 | 长远方案：D4、D6、D7 改为已定；新增 D17–D24（边缘层 Hono + Workers、R2、水印、多平台、隐私法域、两区安全层、审批策略、实验）；WS 协议增加 `chapter.map`、`seek`、`seek.ack`，`progress` 改为位置语义；新增 `Platform`、`StoreProvider`、`AttestProvider`、`Jurisdiction` 枚举；仓库新增 `apps/edge`、`packages/signed-url`；规格补全：WS 增加 `extend`、`job.capped`、`job.truncated` |
+| v1.4 变更 | 配置包签名按区确定算法（ADR 0018，V5）：§5 发布流程、D18 注明签名 URL 不受影响 |
 | v1.3 变更 | 仓库结构（§2）与实际目录对齐：`docs/archs/`、`docs/prds/`、`docs/tasks/`、`docs/progress/`，补 `tools/`、`.mise.toml`、`knip.json` |
 | 依据 | 主 PRD v2.7 草案；《iOS 客户端 PRD》v1.3、《管理后台 PRD》v1.3、《测试台架 PRD》v1.3；在线文档《技术选型分析》（Claude 文档）的两个标签页：「技术选型分析」页（选型结论与各端选型）与「完整技术架构」页（下文简称「完整技术架构」，即在线版系统架构设计） |
 | 读者 | 参与开发的工程师与 AI 编码代理 |
@@ -360,7 +361,7 @@ config/
 └─ compliance/<region>.yaml   # 模型备案公示、合成标识资源版本、投诉时限与类别
 ```
 
-发布流程：PR → CI 校验 schema 与评测门禁 → 合并 → 打包并以 Ed25519 签名 → 上传两区 `config-bundles` 为候选 → 后台 `publisher` 发布（可灰度）→ 服务端 5 分钟内生效、客户端前台时拉取验签。
+发布流程：PR → CI 校验 schema 与评测门禁 → 合并 → 打包并由各区 KMS 签名（海外区 Ed25519，国内区 ECDSA P-256，信封带 `alg` 与 `kid`；ADR 0018）→ 上传两区 `config-bundles` 为候选 → 后台 `publisher` 发布（可灰度）→ 服务端 5 分钟内生效、客户端前台时拉取验签。
 
 配置包结构：
 
@@ -410,7 +411,7 @@ config/
 | D15 | 可豁免门禁清单 | G6、G8、G11、G15（测试台架 PRD TB-WAIVE-02） | 04 |
 | D16 | 各 PRD 待确认事项未决时如何开发 | 一律取各表「未决前的默认」列：主 PRD v2.7 第 13 节、iOS PRD 第 10 节、管理后台 PRD 第 10 节、测试台架 PRD 第 10 节；确认后只改配置与文档 | 全部 |
 | D17 | 海外区边缘层 | **已定**：Cloudflare Workers + Hono，第一天即用框架；承载切片与样帖音频分发、配置包下发、样帖列表、导出文件下载、后台与台架静态页；业务逻辑与状态不进边缘 | 02 §22.1、05 |
-| D18 | 海外区对象存储 | **已定**：Cloudflare R2（Workers 绑定直读，无出网费）；签名 URL 用 Ed25519，签发在主体后端，校验在边缘，共用 `packages/signed-url` | 02、05 |
+| D18 | 海外区对象存储 | **已定**：Cloudflare R2（Workers 绑定直读，无出网费）；签名 URL 用 Ed25519，签发在主体后端，校验在边缘，共用 `packages/signed-url`（不经 KMS，不受 V5 影响，ADR 0018） | 02、05 |
 | D19 | 数字水印 | 默认：自嵌统一水印（开源 AudioSeal，两区相同，限幅之后、编码之前嵌入），并保留厂商自带水印、写入元数据隐式标识；国内元数据格式按国家标准（主 PRD 13 U21 待合规确认） | 02 §22.3、04 G10 |
 | D20 | 多平台 | **已定**：预期接入 Android 或 Web。契约、错误码、权益层（`StoreProvider`）、设备证明（`AttestProvider`）、推送令牌从第一版起与平台无关；本期只交付 iOS | 00、02 §22.4–22.5 |
 | D21 | 隐私合规架构 | **已定**：全球基线（按 GDPR 级别）+ 法域策略配置（`Jurisdiction`），一个安装包、一套后端；策略经 `GET /me` 下发 | 主 PRD 9.7、02 §22.6 |

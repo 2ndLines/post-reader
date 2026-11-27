@@ -50,7 +50,7 @@ apps/server/
 │  │  ├─ queue/                    # BullMQ 队列与 worker 工厂
 │  │  ├─ storage/                  # S3 兼容客户端（OSS / R2 / S3）、签名 URL
 │  │  ├─ kms/                      # 信封加密、DEK 缓存
-│  │  ├─ crypto/                   # HMAC、Ed25519 验签、AES-GCM 字段加密
+│  │  ├─ crypto/                   # HMAC、Ed25519 与 ECDSA P-256 验签（ADR 0018）、AES-GCM 字段加密
 │  │  ├─ http/                     # Fastify 工厂、插件注册顺序、problem+json
 │  │  ├─ ws/                       # WebSocket 连接管理
 │  │  ├─ otel/                     # OpenTelemetry 初始化
@@ -122,7 +122,7 @@ modules/<name>/
 | `S3_ENDPOINT`、`S3_REGION`、`BUCKET_AUDIO_PUBLIC`、`BUCKET_AUDIO_PRIVATE`、`BUCKET_SAMPLES`、`BUCKET_CONFIG` | 对象存储 |
 | `KMS_KEY_ID` | 用户 DEK 的主密钥 |
 | `JWT_SIGNING_KEY_REF` | 凭据服务中的 ES256 私钥引用 |
-| `CONFIG_BUNDLE_PUBKEYS` | Ed25519 公钥（可多个，支持轮换） |
+| `CONFIG_BUNDLE_PUBKEYS` | 配置包验签公钥列表，每项带 `kid` 与 `alg`（海外区 `Ed25519`，国内区 `ES256`，ECDSA 签名为 P1363 原始格式；ADR 0018）；可多个，支持轮换 |
 | `APPLE_TEAM_ID`、`APPLE_BUNDLE_ID`、`APPLE_SIWA_KEY_REF`、`APPSTORE_API_KEY_REF` | Apple 相关 |
 | `VENDOR_*_KEY_REF` | 各厂商密钥引用（实际值从凭据服务读取） |
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | 区内采集端点 |

@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-26（P0-REPO-02 实现完成，PR 待审阅）
+最后更新：2026-11-26（P0-REPO-05 实现完成，PR 待审阅）
 
 ## 当前阶段
 P0 工程基座 · P0-REPO-01 已实现（PR 待审阅）；合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P0-REPO-05：`pnpm dev` 本地容器（四服务健康检查）；V1 5/5、V4 15/15 通过（ADR 0017）；V5：国内区配置包签名改用 ECDSA P-256（ADR 0018）
 - P0-REPO-02：5 份各端 AGENTS.md；根 AGENTS.md 的命令表标注阶段；文档链接检查（`pnpm check:links`，并入 ci）
 - P0-REPO-03：lefthook 提交前与推送前钩子、CODEOWNERS（覆盖 §9.4 全部 31 条并由 CI 校验）、PR 模板
 - P0-CI-01：`ci` 工作流（版本一致性、Action SHA、Biome、类型检查、测试、gitleaks、许可证、audit），AC1–AC3 有运行链接；`tools/ci-checks` 三项检查
@@ -21,11 +22,19 @@ P0 工程基座 · P0-REPO-01 已实现（PR 待审阅）；合规确认与供�
 - P0-CI-01 PR #2 待审阅（叠在 #1 上）；AC4 需负责人先决定助手推送身份并开启规则集（docs/progress/github-settings.md）
 - P0-REPO-03 PR 待审阅（叠在 #2 上）；AC2 需规则集开启「必须 Code Owner 审阅」
 - P0-REPO-02 PR 待审阅（叠在 P0-REPO-03 上）；AC3 需负责人审阅各端 AGENTS.md
-- 其余 2 张 P0 任务卡：下一张 P0-REPO-04
+- P0-REPO-05 PR 待审阅（叠在 P0-REPO-02 上）
+- 其余 1 张 P0 任务卡：P0-REPO-04
 
 ## 阻塞
 - 国内备案与登记需基于选定的国内模型与语音厂商（供应商未定）
 - 海外模型与 TTS 零留存（ZDR）合同未申请
+
+## 负责人待办（按顺序）
+1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → REPO-05 → REPO-04
+2. 决定助手推送与提 PR 的身份（机器用户或 GitHub App），然后开启 `main` 规则集（docs/progress/github-settings.md）
+3. 补做需要你操作的验收：CI-01 AC4（向 `main` 直推被拒）、REPO-03 AC2（Code Owner 自动请求审阅）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5（两区 KMS 只读 API 复核，命令见 ADR 0018）
+4. 批准或修改 ADR 0017、0018
+5. P3 引入 promptfoo 前：决定其依赖树中 BlueOak、PSF、LGPL（libvips）等许可证的处理（ADR 0017 约束 6）
 
 ## 待负责人决策
 - [ ] 助手推送与提 PR 的身份（机器用户或 GitHub App），之后开启 `main` 规则集（docs/progress/github-settings.md）
