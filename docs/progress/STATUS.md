@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-26（P0、P1 全部实现；P2-SRV-01 至 P2-SRV-04 实现，PR 待审阅）
+最后更新：2026-11-26（P0、P1 全部实现；P2-SRV-01 至 P2-SRV-05 实现，PR 待审阅）
 
 ## 当前阶段
 P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 张卡全部实现。P1 出口条件的两项都已满足：TS 与 Swift 两侧 51 条黄金向量全部通过；`openapi.yaml` 生成的 Swift 客户端能编译（V3）。P1-CTR-04 中有 10 项参数尚未标定（`pnpm check:config` 会逐项列出），需负责人提供；在此之前生产模式拒绝加载。合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P2-SRV-05：认证全流程：邮箱验证码、Sign in with Apple 验签、ES256 令牌、刷新轮换（重用时吊销整个 family）、退出登录；15 条集成测试，加 7 条令牌单元测试
 - P2-SRV-04：字段加密（AES-256-GCM，AAD 绑定列与所有者）、KMS 抽象与本地文件密钥（生产环境拒绝）、DEK 的 LRU 缓存；在真实 PostgreSQL 上验证了密码擦除
 - P2-SRV-03：`platform/redis`：令牌桶 Lua（并发下原子）、nonce 防重放、R_daily、会话吊销、验证码冷却；在真实 Valkey 上运行 9 条集成测试
 - P2-SRV-02：身份相关的 5 张表与首个迁移；在真实 PostgreSQL 18 上运行 8 条集成测试（约束、外键、级联删除）；新增 `integration` 工作流与「已发布迁移不可变」检查
@@ -41,7 +42,7 @@ P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 �
 - 海外模型与 TTS 零留存（ZDR）合同未申请
 
 ## 负责人待办（按顺序）
-1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → #7 REPO-05 → #8 REPO-04 → #9 SPEC-01 → #10 IOS-01 → #11 CTR-01 → #12 CTR-03 → #13 CTR-02 → #14 CTR-04 → #15 P2-SRV-01 → #16 P2-SRV-02 → #17 P2-SRV-03 → P2-SRV-04
+1. 按顺序审阅并合并 P0 的 PR（每个 PR 叠在前一个之上）：#1 REPO-01 → #2 CI-01 → #5 REPO-03 → #6 REPO-02 → #7 REPO-05 → #8 REPO-04 → #9 SPEC-01 → #10 IOS-01 → #11 CTR-01 → #12 CTR-03 → #13 CTR-02 → #14 CTR-04 → #15 P2-SRV-01 → #16 P2-SRV-02 → #17 P2-SRV-03 → #18 P2-SRV-04 → P2-SRV-05
 2. 决定助手推送与提 PR 的身份（机器用户或 GitHub App），然后开启 `main` 规则集（docs/progress/github-settings.md）
 3. 补做需要你操作的验收：CI-01 AC4（向 `main` 直推被拒）、REPO-03 AC2（Code Owner 自动请求审阅）、REPO-02 AC3（审阅各端 AGENTS.md）、REPO-05 V5（两区 KMS 只读 API 复核，命令见 ADR 0018）
 4. 创建只读的 fine-grained PAT，并在本机设置 `GITHUB_MCP_TOKEN`（`.mcp.json` 中的 github MCP 用）
