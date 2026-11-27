@@ -41,6 +41,7 @@
 | [P2-SRV-03](P2-SRV-03.md) | `platform/redis`：令牌桶 Lua、nonce、R_daily、会话吊销、验证码冷却 | SRV-01 | Q1（超限时计数是否回退） | PR 待审阅 |
 | [P2-SRV-04](P2-SRV-04.md) | `platform/kms` 与字段加密（本地文件密钥模拟 KMS） | SRV-02 | Q1（AAD 绑定规则）、Q2（版本字节） | PR 待审阅 |
 | [P2-SRV-05](P2-SRV-05.md) | `auth`：邮箱验证码、Sign in with Apple、令牌签发与轮换、吊销 | SRV-02–04 | Q1–Q4（并发刷新、计费时区、账号关联） | PR 待审阅 |
+| [P2-SRV-06](P2-SRV-06.md) | 请求签名中间件与重放测试（与 iOS 共用的黄金向量） | SRV-05 | Q1（规范化查询串）、Q2（时间窗的错误码） | PR 待审阅 |
 
 ## 之后
 

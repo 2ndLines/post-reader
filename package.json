@@ -28,7 +28,8 @@
     "check:config": "node packages/config-schema/scripts/check-config.ts",
     "test:int": "turbo run test:int",
     "db:migrate:new": "pnpm --filter @post-reader/server db:migrate:new",
-    "check:migrations": "node tools/ci-checks/src/cli/migrations.ts"
+    "check:migrations": "node tools/ci-checks/src/cli/migrations.ts",
+    "check:sig-vectors": "python3 -I packages/contracts/scripts/request_signature_vectors.py"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",

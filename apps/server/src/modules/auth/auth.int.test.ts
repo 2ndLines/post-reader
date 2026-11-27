@@ -7,6 +7,11 @@ import { eq } from 'drizzle-orm';
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT } from 'jose';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { decryptField } from '../../platform/crypto/field.ts';
+import {
+  computeSignature,
+  parseQueryPairs,
+  stringToSign,
+} from '../../platform/crypto/request-signature.ts';
 import { createTestDatabase } from '../../platform/db/test-database.ts';
 import { buildApp } from '../../platform/http/app.ts';
 import { DekCache } from '../../platform/kms/dek-cache.ts';
@@ -15,9 +20,10 @@ import { getUserDek } from '../../platform/kms/user-keys.ts';
 import { createLogger } from '../../platform/logger.ts';
 import { createRedis } from '../../platform/redis/client.ts';
 import { MemoryOutbox } from './email.ts';
-import { authRoutes } from './routes.ts';
+import { authRoutes, requireAuth } from './routes.ts';
 import { authIdentities, sessions, users } from './schema.ts';
 import { AuthService } from './service.ts';
+import { requireSignature } from './signature-guard.ts';
 
 const BUNDLE_ID = 'com.example.postreader';
 const prefix = `test:${randomBytes(4).toString('hex')}:`;
@@ -76,8 +82,15 @@ beforeAll(async () => {
           bundleId: BUNDLE_ID,
           exchanger: { exchange: async () => ({ refreshToken: 'apple-refresh-token-value' }) },
         },
+        signature: { db: t.db, redis, kms, dekCache },
       }),
     { prefix: '/v1' },
+  );
+  // 只在测试中注册：需要认证与签名、本身没有副作用的路由，用于端到端验证重放
+  app.post(
+    '/v1/_test/signed',
+    { preHandler: [requireAuth(service), requireSignature({ db: t.db, redis, kms, dekCache })] },
+    async (_request, reply) => reply.status(204).send(),
   );
   await app.ready();
 });
@@ -92,6 +105,42 @@ afterAll(async () => {
 
 const post = (url: string, payload: unknown, headers: Record<string, string> = {}) =>
   app.inject({ method: 'POST', url: `/v1${url}`, payload: payload as object, headers });
+
+type Session = { accessToken: string; sessionKey: string };
+
+/** 客户端签名（与 iOS SigningMiddleware 相同的算法；本实现已对独立的 Python 黄金向量验证过） */
+function signedHeaders(
+  session: Session,
+  method: string,
+  url: string,
+  body: string,
+  overrides: Partial<{ ts: string; nonce: string; key: Uint8Array }> = {},
+) {
+  const ts = overrides.ts ?? String(Date.now());
+  const nonce = overrides.nonce ?? randomBytes(8).toString('hex');
+  const q = url.indexOf('?');
+  const sts = stringToSign({
+    method,
+    path: q === -1 ? url : url.slice(0, q),
+    query: parseQueryPairs(url),
+    ts,
+    nonce,
+    rawBody: new TextEncoder().encode(body),
+  });
+  return {
+    authorization: `Bearer ${session.accessToken}`,
+    'x-ts': ts,
+    'x-nonce': nonce,
+    'x-sig': computeSignature(overrides.key ?? Buffer.from(session.sessionKey, 'base64'), sts),
+  };
+}
+
+const logout = (session: Session, overrides = {}) =>
+  app.inject({
+    method: 'POST',
+    url: '/v1/auth/logout',
+    headers: signedHeaders(session, 'POST', '/v1/auth/logout', '', overrides),
+  });
 
 async function emailLogin(email: string, extra: Record<string, unknown> = { ageConfirmed: true }) {
   expect((await post('/auth/email/code', { email })).statusCode).toBe(204);
@@ -299,9 +348,8 @@ describe('刷新、轮换与吊销（02 §10.1）', () => {
 
   it('退出登录后访问令牌立即失效、refresh token 不可再用', async () => {
     const login = (await emailLogin('ivy@example.com')).json();
-    const auth = { authorization: `Bearer ${login.accessToken}` };
-    expect((await post('/auth/logout', {}, auth)).statusCode).toBe(204);
-    expect((await post('/auth/logout', {}, auth)).json().code).toBe('AUTH_REVOKED');
+    expect((await logout(login)).statusCode).toBe(204);
+    expect((await logout(login)).json().code).toBe('AUTH_REVOKED');
     expect((await post('/auth/refresh', { refreshToken: login.refreshToken })).json().code).toBe(
       'AUTH_REVOKED',
     );
@@ -312,5 +360,112 @@ describe('刷新、轮换与吊销（02 §10.1）', () => {
     expect(
       (await post('/auth/logout', {}, { authorization: 'Bearer not.a.jwt' })).json().code,
     ).toBe('AUTH_EXPIRED');
+  });
+});
+
+describe('请求签名与防重放（02 §10.3；P2 出口条件）', () => {
+  let session: Session;
+  beforeAll(async () => {
+    session = (await emailLogin('sig@example.com')).json();
+  });
+  const expectCode = async (
+    res: Promise<{ statusCode: number; json: () => { code: string; detail?: string } }>,
+    code: string,
+  ) => {
+    const r = await res;
+    expect(r.statusCode).toBe(401);
+    expect(r.json().code).toBe(code);
+    return r.json();
+  };
+
+  it('签名错误的请求被拒：用错的密钥、缺少签名头', async () => {
+    await expectCode(logout(session, { key: randomBytes(32) }), 'SIGNATURE_INVALID');
+    const missing = await app.inject({
+      method: 'POST',
+      url: '/v1/auth/logout',
+      headers: { authorization: `Bearer ${session.accessToken}` },
+    });
+    expect(missing.json()).toMatchObject({ code: 'SIGNATURE_INVALID', detail: 'headers' });
+  });
+
+  it('时间戳超出 ±300 s：SIGNATURE_INVALID（timestamp）', async () => {
+    const old = await expectCode(
+      logout(session, { ts: String(Date.now() - 301_000) }),
+      'SIGNATURE_INVALID',
+    );
+    expect(old.detail).toBe('timestamp');
+    await expectCode(logout(session, { ts: String(Date.now() + 301_000) }), 'SIGNATURE_INVALID');
+    await expectCode(logout(session, { ts: 'not-a-number' }), 'SIGNATURE_INVALID');
+  });
+
+  it('签名覆盖请求体、路径与查询串：任一被改动都失败', async () => {
+    const signedFor = (url: string, body: string) => signedHeaders(session, 'POST', url, body);
+    const tamperedBody = await app.inject({
+      method: 'POST',
+      url: '/v1/auth/logout',
+      headers: { ...signedFor('/v1/auth/logout', '{"a":1}'), 'content-type': 'application/json' },
+      payload: '{"a":2}',
+    });
+    expect(tamperedBody.json().code).toBe('SIGNATURE_INVALID');
+    const tamperedQuery = await app.inject({
+      method: 'POST',
+      url: '/v1/auth/logout?x=2',
+      headers: signedFor('/v1/auth/logout?x=1', ''),
+    });
+    expect(tamperedQuery.json().code).toBe('SIGNATURE_INVALID');
+    const tamperedPath = await app.inject({
+      method: 'POST',
+      url: '/v1/auth/logout',
+      headers: signedFor('/v1/auth/other', ''),
+    });
+    expect(tamperedPath.json().code).toBe('SIGNATURE_INVALID');
+  });
+
+  it('同一请求原样重放：第一次通过，第二次 REPLAY_DETECTED', async () => {
+    const url = '/v1/_test/signed';
+    const headers = signedHeaders(session, 'POST', url, '');
+    expect((await app.inject({ method: 'POST', url, headers })).statusCode).toBe(204);
+    await expectCode(app.inject({ method: 'POST', url, headers }), 'REPLAY_DETECTED');
+  });
+
+  it('签名失败的请求不会占用 nonce：随后用同一 nonce 的正确签名仍能通过', async () => {
+    const url = '/v1/_test/signed';
+    await expectCode(
+      app.inject({
+        method: 'POST',
+        url,
+        headers: signedHeaders(session, 'POST', url, '', { nonce: 'n-1', key: randomBytes(32) }),
+      }),
+      'SIGNATURE_INVALID',
+    );
+    const ok = await app.inject({
+      method: 'POST',
+      url,
+      headers: signedHeaders(session, 'POST', url, '', { nonce: 'n-1' }),
+    });
+    expect(ok.statusCode).toBe(204);
+  });
+
+  it('并发重放同一请求：只有一个通过', async () => {
+    const url = '/v1/_test/signed';
+    const headers = signedHeaders(session, 'POST', url, '');
+    const results = await Promise.all(
+      Array.from({ length: 5 }, () => app.inject({ method: 'POST', url, headers })),
+    );
+    expect(results.filter((r) => r.statusCode === 204)).toHaveLength(1);
+    const rejected = results.filter((r) => r.statusCode !== 204);
+    expect(rejected.map((r) => [r.statusCode, r.json().code])).toEqual(
+      Array(4).fill([401, 'REPLAY_DETECTED']),
+    );
+  });
+
+  it('查询串中的 + 按字面参与签名（不当作空格）', async () => {
+    const url = '/v1/_test/signed?q=a+b';
+    const res = await app.inject({
+      method: 'POST',
+      url,
+      headers: signedHeaders(session, 'POST', url, ''),
+    });
+    expect(res.statusCode).toBe(204);
   });
 });

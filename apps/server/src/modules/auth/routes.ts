@@ -25,6 +25,7 @@ import {
   verifyEmailCode,
 } from './email.ts';
 import type { AuthService } from './service.ts';
+import { requireSignature, type SignatureDeps } from './signature-guard.ts';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -39,10 +40,11 @@ export interface AuthRouteDeps {
   emailHashKey: Uint8Array;
   emailLimits: EmailCodeLimits;
   apple: { jwks: JWTVerifyGetKey; bundleId: string; exchanger: AppleCodeExchanger };
+  signature: SignatureDeps;
 }
 
 /** preHandler：校验 Authorization: Bearer <accessToken>，结果放在 request.auth */
-function requireAuth(service: AuthService) {
+export function requireAuth(service: AuthService) {
   return async (request: FastifyRequest) => {
     const header = request.headers.authorization;
     const token = header?.startsWith('Bearer ') ? header.slice(7) : undefined;
@@ -121,8 +123,12 @@ export async function authRoutes(app: FastifyInstance, deps: AuthRouteDeps): Pro
     },
   );
 
-  app.post('/auth/logout', { preHandler: requireAuth(service) }, async (request, reply) => {
-    await service.logout(request.auth as NonNullable<FastifyRequest['auth']>);
-    return reply.status(204).send();
-  });
+  app.post(
+    '/auth/logout',
+    { preHandler: [requireAuth(service), requireSignature(deps.signature)] },
+    async (request, reply) => {
+      await service.logout(request.auth as NonNullable<FastifyRequest['auth']>);
+      return reply.status(204).send();
+    },
+  );
 }

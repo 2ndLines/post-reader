@@ -67,6 +67,9 @@ jobs:
       - name: 已发布的迁移未被修改或删除
         run: pnpm check:migrations
 
+      - name: 请求签名黄金向量与独立 Python 实现一致
+        run: pnpm check:sig-vectors
+
       - name: config/ 通过 schema（列出未标定参数，不因未标定失败）
         run: pnpm check:config
 
