@@ -12,9 +12,17 @@ let package = Package(
     ],
     dependencies: [
         .package(path: "../ReaderCore"),
+        // GRDB + SQLCipher：源码由 Vendor/fetch-grdb.sh 取得并校验（ADR 0019）
+        .package(path: "../../Vendor/GRDB"),
     ],
     targets: [
-        .target(name: "Storage", dependencies: [.product(name: "ReaderCore", package: "ReaderCore")]),
+        .target(
+            name: "Storage",
+            dependencies: [
+                .product(name: "ReaderCore", package: "ReaderCore"),
+                .product(name: "GRDB", package: "GRDB"),
+            ]
+        ),
         .testTarget(name: "StorageTests", dependencies: ["Storage"]),
         .target(name: "StorageInbox"),
         .testTarget(name: "StorageInboxTests", dependencies: ["StorageInbox"]),

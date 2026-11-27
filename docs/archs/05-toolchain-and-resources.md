@@ -75,6 +75,7 @@ P0–P12 与 `ai-dev-playbook.md` 第 6 节一致：P0 工程基座 · P1 契约
 | V1 | Node 26 下 BullMQ、Testcontainers、drizzle-kit、promptfoo、Pulumi 全部可用（Node 26 移除了部分旧 API） | P0 | 回退 Node 24，写 ADR |
 | | **已验证（2026-11-26）**：5 项全部通过，维持 Node 26；实现约束见 ADR 0017 | | |
 | V2 | GRDB + SQLCipher 的 SPM 集成方式（Share Extension 与主 App 共用） | P4 首个任务 | 换用 SQLCipher 官方 SPM 包 + GRDB 的自定义构建方式；仍不行则停下报告 |
+| | **已验证（2026-11-27，P4-IOS-03）**：GRDB 不支持直接经 SPM 启用 SQLCipher，采用回退方案：上游源码 + 按上游注释修改清单 + 官方 `SQLCipher.swift` 4.20.0。加密、迁移、密码擦除在模拟器上通过；做法见 ADR 0019 | | |
 | V3 | `@asteasolutions/zod-to-openapi` 与所用 zod 主版本兼容，生成结果能被 swift-openapi-generator 消费 | P1 | 改用 zod 自带的 JSON Schema 导出加自写 OpenAPI 组装脚本 |
 | | **已验证（2026-11-26，P1-CTR-02）**：zod 4.6.7 + zod-to-openapi 9.1.0 生成 OpenAPI 3.1.0；swift-openapi-generator 1.14 生成的客户端在 macOS 与 iOS 27.2 模拟器上编译并通过测试。约束：zod 4 的 `openapi()` 只挂到补丁之后创建的 schema 上，所以 `extendZodWithOpenApi` 必须在加载契约之前执行（`src/openapi-setup.ts`） | | |
 | V4 | 本地 S3 替身（SeaweedFS）的预签名 URL、分段上传、`DeleteObjects` 与 AWS S3 / OSS 行为一致 | P0 | 换另一种 S3 替身；集成测试中对象存储相关用例在预发补测 |
@@ -403,7 +404,8 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 
 | 库 / 工具 | 用途 | 位置 | 阶段 | 状态 | 使用规范 |
 | --- | --- | --- | --- | --- | --- |
-| GRDB.swift（SQLCipher 集成） | 加密 SQLite | `Storage` | P4 | 默认（V2） | 只经 `Storage` 模块；迁移只追加；密钥来自 Keychain，不写日志 |
+| GRDB.swift（SQLCipher 集成） | 加密 SQLite | `Storage` | P4 | 提议（V2 已验证，ADR 0019 待批准） | 只经 `Storage` 模块；迁移只追加；密钥来自 Keychain，不写日志；源码由 `apps/ios/Vendor/fetch-grdb.sh` 取得并校验 |
+| SQLCipher.swift | GRDB 的加密 SQLite（官方二进制包） | `Storage`（经 GRDB） | P4 | 提议（ADR 0019 待批准） | `exact` 固定版本；升级由负责人审阅 |
 | swift-openapi-generator（构建插件）、swift-openapi-runtime、swift-openapi-urlsession | API 客户端 | `APIClient`、`Networking` | P1（`APIClient` 包为验证 V3 提前建立；`Networking` 在 P4） | 已定 | 生成代码不入库、不手改；输入是 `packages/contracts/dist/openapi.yaml` 的副本 |
 | sentry-cocoa | 崩溃与性能 | App | P5 | 已定 | 关闭网络面包屑中的 URL、截图、视图层级、Session Replay；`sendDefaultPii = false`；dSYM 在 Xcode Cloud 构建后上传 |
 | SwiftSoup | `direct_html` 规则解析 | `Capture`（仅主 App） | P8 | 已定 | 输入先截断到上限；不在 Share Extension 内使用 |

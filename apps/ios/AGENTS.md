@@ -7,6 +7,7 @@
 - `make -C apps/ios project`：由 `project.yml` 生成工程（XcodeGen）
 - `make -C apps/ios lint test`：SwiftLint、SwiftFormat 检查与模拟器测试；宣称完成前必须通过
 - `make -C apps/ios format`：SwiftFormat 改写；`make -C apps/ios build`：只构建
+- `make project` 先执行 `Vendor/fetch-grdb.sh`：取得 GRDB 源码并启用 SQLCipher（摘要校验，ADR 0019）；`Vendor/GRDB/` 不入库
 - 工具版本由根 `.mise.toml` 固定（xcodegen、swiftlint、swiftformat），Makefile 经 `mise exec` 调用
 - 需要看界面时：`xcrun simctl io booted screenshot <文件>`，截图附在 PR 中
 

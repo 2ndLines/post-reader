@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, lstatSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { extractLinks, toRelativePath } from '../links.ts';
 import { repoRoot } from './repo.ts';
@@ -13,13 +13,16 @@ const SKIP_DIRS = new Set([
   '.remember',
   '.build',
   '.swiftpm',
+  // 构建前取得的第三方源码（apps/ios/Vendor/GRDB，不入库）
+  'Vendor',
 ]);
 
 function collect(dir: string, out: string[]): string[] {
   for (const name of readdirSync(dir)) {
     if (SKIP_DIRS.has(name)) continue;
     const full = join(dir, name);
-    if (statSync(full).isDirectory()) collect(full, out);
+    // 不跟随符号链接（第三方源码中有指向自身的链接）
+    if (lstatSync(full).isDirectory()) collect(full, out);
     else if (name.endsWith('.md')) {
       const rel = relative(repoRoot, full);
       if (rel.startsWith('docs/') || name === 'AGENTS.md' || name === 'README.md') out.push(full);

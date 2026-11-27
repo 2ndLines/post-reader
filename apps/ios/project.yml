@@ -74,6 +74,21 @@ targets:
         product: StorageInbox
       - package: Capture
         product: CaptureDirect
+  PostReaderTests:
+    # 宿主为 App 的单元测试：需要 App 进程与签名环境的系统能力（Keychain 等）放在这里
+    type: bundle.unit-test
+    platform: iOS
+    sources: [AppTests]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).tests
+        GENERATE_INFOPLIST_FILE: YES
+        BUNDLE_LOADER: $(TEST_HOST)
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/PostReader.app/PostReader
+    dependencies:
+      - target: PostReader
+      - package: Storage
+        product: Storage
   PostReaderUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -95,6 +110,7 @@ schemes:
     test:
       config: Debug
       targets:
+        - PostReaderTests
         - PostReaderUITests
         - package: ReaderCore/ReaderCoreTests
         - package: Storage/StorageTests
