@@ -46,7 +46,7 @@
 - **R1 数据库角色与列级授权**（`app_rw`、`admin_limited`、`migrator`）属于部署与 P9 的范围。本卡迁移以当前连接的角色执行。
 
 ## 交接记录（会话结束时填写）
-**2026-11-26 · AC1–AC4 已完成；AC5 见 PR 的 CI**
+**2026-11-26 · AC1–AC5 已完成**
 - **集成测试**：8 条全部通过，运行在本地 `postgres:18.7` 容器上（同一 digest）。
 - **AC1**：迁移建出 5 张表；对已迁移的数据库再执行一次迁移不报错；数据库版本 ≥ 18。
 - **AC2**：
@@ -60,4 +60,8 @@
 - **补充**：
   - bytea 列按字节原样读写；`counter` 能正确存取超过 2^53 的 bigint。
   - UUIDv7 的版本位、变体位正确，且按生成时间有序。
+- **CI 中发现的问题**：`integration` 工作流第一次运行时报 `password authentication failed`。原因是 turbo 的严格环境模式只把 `turbo.json` 中声明过的变量传给任务，工作流设置的 `TEST_DATABASE_URL` 没有传进去，测试于是退回本地默认的连接串与密码。本地能通过，只是因为默认值恰好指向本地容器。
+  - 修复：在 `turbo.json` 中为 `test:int` 声明 `passThroughEnv: ["TEST_DATABASE_URL"]`。
+  - 验证：故意传入错误的密码时，任务报密码错误，说明变量已经传入；修复后 CI 的 [integration 运行 45923784524](https://github.com/2ndLines/post-reader/actions/runs/45923784524) 通过。
+  - 今后新增任务所需的环境变量，都要在 `turbo.json` 中声明。
 - **下一步**：P2-SRV-03（`platform/redis`、令牌桶 Lua 脚本、nonce）。
