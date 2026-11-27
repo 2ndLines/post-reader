@@ -1,0 +1,9 @@
+{
+  "extends": "@post-reader/tooling/tsconfig.base.json",
+  "compilerOptions": {
+    "erasableSyntaxOnly": true,
+    "lib": ["es2024", "esnext.string"],
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts", "vitest.config.ts"]
+}

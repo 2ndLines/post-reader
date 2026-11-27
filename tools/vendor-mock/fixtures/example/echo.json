@@ -1,0 +1,10 @@
+{
+  "name": "example-echo",
+  "vendor": "example",
+  "request": { "method": "POST", "path": "/v1/example/echo" },
+  "response": {
+    "status": 200,
+    "headers": { "content-type": "application/json" },
+    "body": { "ok": true }
+  }
+}

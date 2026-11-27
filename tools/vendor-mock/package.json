@@ -1,0 +1,22 @@
+{
+  "name": "@post-reader/vendor-mock",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "厂商 mock 服务（05 §3.2、playbook §6.4 P2-SRV-08）：录制与回放、延迟与错误注入；本地与 CI 不需要任何真实厂商密钥",
+  "scripts": {
+    "start": "node src/main.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "fastify": "5.12.8"
+  },
+  "devDependencies": {
+    "@post-reader/tooling": "workspace:*",
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.1",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}

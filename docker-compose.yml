@@ -1,7 +1,7 @@
 # 本地开发依赖（05 §3.2、附录 D；任务卡 P0-REPO-05）。只用于本地，账号密码见 env.example。
 # 镜像一律按多架构 index digest 固定（arm64 开发机与 amd64 CI 共用同一引用），由 Renovate 更新（05 §5.5）。
 # 集成测试（Testcontainers）从本文件读取同一镜像引用，不另写版本。
-# 端口只绑定 127.0.0.1。不使用 MinIO（05 §3.2）。vendor-mock 在 P2 加入。
+# 端口只绑定 127.0.0.1。不使用 MinIO（05 §3.2）。vendor-mock 不进 compose，在宿主机运行：`pnpm mock`（P2-SRV-08 Q1）。
 name: post-reader
 
 services:
