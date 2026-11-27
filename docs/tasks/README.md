@@ -24,6 +24,7 @@
 | 编号 | 内容 | 依赖 | 需负责人 | 状态 |
 | --- | --- | --- | --- | --- |
 | [P1-SPEC-01](P1-SPEC-01.md) | `canonical-spec`：SPEC.md、TS 参考实现、黄金向量 | P0 | 确认 Q1–Q7，冻结 schemaVersion | PR 待审阅 |
+| [P1-IOS-01](P1-IOS-01.md) | `ReaderCore`：Swift 清洗与摘要，读取同一组向量 | SPEC-01 | — | PR 待审阅 |
 
 ## 之后
 
