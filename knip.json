@@ -16,6 +16,10 @@
     "packages/canonical-spec": {
       "entry": ["src/**/*.test.ts"],
       "project": ["**/*.ts"]
+    },
+    "packages/contracts": {
+      "entry": ["src/**/*.test.ts"],
+      "project": ["**/*.ts"]
     }
   }
 }
