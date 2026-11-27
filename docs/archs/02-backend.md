@@ -632,6 +632,11 @@ X-Sig          = base64url(HMAC-SHA256(k_sess, string_to_sign))
 
 时间窗 ±300 s；`SET nonce:{sid}:{nonce} 1 EX 600 NX`；`crypto.timingSafeEqual` 比较。
 
+- `CANONICAL_QUERY`（P2-SRV-06 补全）：按解码后的（键、值）以 Unicode 码点顺序排序；键与值按 RFC 3986 编码，只保留 `A-Z a-z 0-9 - . _ ~`；`key=value` 以 `&` 连接；没有查询参数时为空串。查询串只做百分号解码，`+` 不当作空格。
+- `X-Ts` 为 Unix 毫秒。
+- 两侧共用的黄金向量：`packages/contracts/vectors/request-signature.json`，由 `packages/contracts/scripts/request_signature_vectors.py`（只用 Python 标准库）生成，CI 中的 `pnpm check:sig-vectors` 校验该文件。
+- 校验顺序：时间窗 → 签名 → 占用 nonce，签名失败的请求不占用 nonce。时间窗与签名失败都返回 `SIGNATURE_INVALID`，nonce 重复返回 `REPLAY_DETECTED`。
+
 ### 10.4 字段加密
 
 `platform/crypto/field.ts`：AES-256-GCM，`iv` 12 字节随机，存储格式 `v1 | iv | ciphertext | tag`；DEK 由 `platform/kms` 按用户解包并缓存。加密字段：`users.email_enc`、`auth_identities.provider_refresh_enc`、`sessions.session_key_enc`、`job_units.clean_text_enc`、`job_units.translated_enc`。

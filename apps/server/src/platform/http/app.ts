@@ -14,6 +14,8 @@ import { RequestValidationError, zodSerializerCompiler, zodValidatorCompiler } f
 declare module 'fastify' {
   interface FastifyRequest {
     clientVersion: string | undefined;
+    /** 原始请求体：请求签名对它计算摘要（02 §4.1：自定义 contentTypeParser 同时保留 rawBody） */
+    rawBody: Buffer | undefined;
   }
 }
 
@@ -50,6 +52,21 @@ export async function buildApp(options: { logger: Logger; readiness: Readiness }
   app.setValidatorCompiler(zodValidatorCompiler);
   app.setSerializerCompiler(zodSerializerCompiler);
   app.decorateRequest('clientVersion', undefined);
+  app.decorateRequest('rawBody', undefined);
+  // JSON 请求体：保留原始字节供签名校验；空请求体视为没有 body（例如 POST /auth/logout）
+  app.removeContentTypeParser('application/json');
+  app.addContentTypeParser('application/json', { parseAs: 'buffer' }, (request, body, done) => {
+    const raw = body as Buffer;
+    request.rawBody = raw;
+    if (raw.length === 0) return done(null, undefined);
+    try {
+      done(null, JSON.parse(raw.toString('utf8')));
+    } catch {
+      const error = new Error('invalid json') as Error & { statusCode: number };
+      error.statusCode = 400;
+      done(error, undefined);
+    }
+  });
 
   // 1 requestContext：requestId 回写响应头；读取 X-Client-Version
   app.addHook('onRequest', async (request, reply) => {
