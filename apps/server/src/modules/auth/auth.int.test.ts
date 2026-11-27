@@ -83,6 +83,17 @@ beforeAll(async () => {
           exchanger: { exchange: async () => ({ refreshToken: 'apple-refresh-token-value' }) },
         },
         signature: { db: t.db, redis, kms, dekCache },
+        // 本文件测试认证本身；App Attest 在 attest.int.test.ts 中以 enforce: true 单独测试
+        attest: {
+          db: t.db,
+          redis,
+          teamId: 'T',
+          bundleId: BUNDLE_ID,
+          rootCertificatePem: '',
+          environment: 'development',
+          enforce: false,
+          nodeEnv: 'test',
+        },
       }),
     { prefix: '/v1' },
   );

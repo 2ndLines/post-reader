@@ -4,6 +4,8 @@
  */
 import {
   AppleSignInRequest,
+  AttestChallengeResponse,
+  AttestVerifyRequest,
   AuthSession,
   EmailCodeRequest,
   EmailVerifyRequest,
@@ -16,6 +18,12 @@ import type { JWTVerifyGetKey } from 'jose';
 import type { z } from 'zod';
 import { AppError } from '../../platform/http/errors.ts';
 import { type AppleCodeExchanger, AppleTokenError, verifyAppleIdentityToken } from './apple.ts';
+import {
+  type AttestDeps,
+  issueChallenge,
+  registerAttestation,
+  requireAttest,
+} from './attest-guard.ts';
 import {
   type EmailCodeLimits,
   emailHash,
@@ -41,6 +49,7 @@ export interface AuthRouteDeps {
   emailLimits: EmailCodeLimits;
   apple: { jwks: JWTVerifyGetKey; bundleId: string; exchanger: AppleCodeExchanger };
   signature: SignatureDeps;
+  attest: AttestDeps;
 }
 
 /** preHandler：校验 Authorization: Bearer <accessToken>，结果放在 request.auth */
@@ -55,6 +64,7 @@ export function requireAuth(service: AuthService) {
 
 export async function authRoutes(app: FastifyInstance, deps: AuthRouteDeps): Promise<void> {
   app.decorateRequest('auth', undefined);
+  app.decorateRequest('attestedDeviceId', undefined);
   const { service, redis } = deps;
 
   app.post('/auth/email/code', { schema: { body: EmailCodeRequest } }, async (request, reply) => {
@@ -116,10 +126,36 @@ export async function authRoutes(app: FastifyInstance, deps: AuthRouteDeps): Pro
 
   app.post(
     '/auth/refresh',
-    { schema: { body: RefreshRequest, response: { 200: RefreshResponse } } },
+    {
+      preHandler: requireAttest(deps.attest),
+      schema: { body: RefreshRequest, response: { 200: RefreshResponse } },
+    },
     async (request) => {
       const { refreshToken } = request.body as z.infer<typeof RefreshRequest>;
-      return service.refresh(refreshToken);
+      return service.refresh(
+        refreshToken,
+        deps.attest.enforce ? request.attestedDeviceId : undefined,
+      );
+    },
+  );
+
+  app.post(
+    '/attest/challenge',
+    { preHandler: requireAuth(service), schema: { response: { 200: AttestChallengeResponse } } },
+    async (request) =>
+      issueChallenge(deps.attest, (request.auth as NonNullable<FastifyRequest['auth']>).sid),
+  );
+
+  app.post(
+    '/attest/verify',
+    { preHandler: requireAuth(service), schema: { body: AttestVerifyRequest } },
+    async (request, reply) => {
+      await registerAttestation(
+        deps.attest,
+        (request.auth as NonNullable<FastifyRequest['auth']>).sid,
+        request.body as z.infer<typeof AttestVerifyRequest>,
+      );
+      return reply.status(204).send();
     },
   );
 

@@ -46,6 +46,8 @@ const signatureHeaders = {
     .meta({ description: 'base64url(HMAC-SHA256(k_sess, string_to_sign))' }),
 };
 const attestHeaders = {
+  // 断言的 clientData 包含 X-Ts（02 §10.2），所以只要求 Attest、不要求签名的接口（/auth/refresh）也要带
+  'X-Ts': z.string().regex(/^\d+$/).meta({ description: '请求时间，Unix 毫秒' }),
   'X-Attest-Key-Id': z.string().min(1).meta({ description: 'App Attest keyId（P1-CTR-02 Q3）' }),
   'X-Attest-Assertion': z
     .string()

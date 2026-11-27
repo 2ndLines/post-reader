@@ -708,6 +708,14 @@ paths:
           in: header
         - schema:
             type: string
+            pattern: ^\d+$
+            description: 请求时间，Unix 毫秒
+          required: true
+          description: 请求时间，Unix 毫秒
+          name: X-Ts
+          in: header
+        - schema:
+            type: string
             minLength: 1
             description: App Attest keyId（P1-CTR-02 Q3）
           required: true
@@ -1636,9 +1644,9 @@ paths:
         - schema:
             type: string
             pattern: ^\d+$
-            description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+            description: 请求时间，Unix 毫秒
           required: true
-          description: 请求时间，Unix 毫秒（P1-CTR-02 Q2）
+          description: 请求时间，Unix 毫秒
           name: X-Ts
           in: header
         - schema:
