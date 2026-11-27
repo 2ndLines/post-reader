@@ -27,6 +27,7 @@ config/（配置即代码）  evals/（样本与门禁）  infra/（Pulumi）  t
 | `pnpm knip` | 未使用的文件、导出、依赖 | 可用 |
 | `pnpm check:versions` / `check:pins` / `check:licenses` / `check:codeowners` / `check:links` | CI 中的仓库级检查（工具版本、Action SHA、许可证、CODEOWNERS、文档链接） | 可用 |
 | `pnpm dev` / `dev:down` | Docker Compose 拉起或停止本地依赖 | 可用 |
+| `pnpm mock` | 厂商 mock（回放模式，端口 4010；录制只在负责人授权的任务中） | 可用 |
 | `pnpm contracts:gen` / `contracts:check` | 生成 `openapi.yaml`（并复制到 iOS APIClient）/ 校验生成物与源一致 | 可用 |
 | `pnpm spec:vectors` | 黄金向量（TS 测试 + 独立 Python 摘要复核） | 可用 |
 | `pnpm test:int` | 集成测试（真实 PostgreSQL；本地先 `pnpm dev`） | 可用 |

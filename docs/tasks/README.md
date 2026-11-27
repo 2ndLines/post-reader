@@ -43,6 +43,7 @@
 | [P2-SRV-05](P2-SRV-05.md) | `auth`：邮箱验证码、Sign in with Apple、令牌签发与轮换、吊销 | SRV-02–04 | Q1–Q4（并发刷新、计费时区、账号关联） | PR 待审阅 |
 | [P2-SRV-06](P2-SRV-06.md) | 请求签名中间件与重放测试（与 iOS 共用的黄金向量） | SRV-05 | Q1（规范化查询串）、Q2（时间窗的错误码） | PR 待审阅 |
 | [P2-SRV-07](P2-SRV-07.md) | App Attest：证明登记、断言校验，`/auth/refresh` 要求设备证明 | SRV-05 | Q1（合成测试数据）、Q2（clientData 格式） | PR 待审阅 |
+| [P2-SRV-08](P2-SRV-08.md) | 厂商 Mock 服务：回放、录制（需授权）、延迟 / 错误 / 挂起 / 断开注入 | SRV-01 | Q1（是否进 compose）、Q2（02 §15 的目录位置） | PR 待审阅 |
 
 ## 之后
 

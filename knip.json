@@ -28,6 +28,10 @@
     "apps/server": {
       "entry": ["src/entry/*.ts", "src/**/*.test.ts"],
       "project": ["**/*.ts"]
+    },
+    "tools/vendor-mock": {
+      "entry": ["src/**/*.test.ts"],
+      "project": ["**/*.ts"]
     }
   }
 }
