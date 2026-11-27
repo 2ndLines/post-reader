@@ -10,6 +10,8 @@ packages:
 allowBuilds:
   # 不运行它的 postinstall（会静默改写 .git/hooks）；钩子由根 package.json 的 prepare 显式安装
   lefthook: false
+  # OpenTelemetry 的间接依赖；安装脚本只做安装后自检，V1 实测不需要（ADR 0017）
+  protobufjs: false
 
 # 新版本发布满 3 天（单位：分钟）才允许安装（05 §2.5）
 minimumReleaseAge: 4320

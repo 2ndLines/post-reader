@@ -30,6 +30,14 @@
 | [P1-CTR-04](P1-CTR-04.md) | `config-schema` 与 `config/` 初始文件（未标定参数显式标记） | CTR-01 | 提供 10 项标定值；确认 Q1–Q3 | PR 待审阅 |
 | [P1-CTR-03](P1-CTR-03.md) | WebSocket 消息类型与兼容性测试 | CTR-01 | 确认 Q1（降级原因取值） | PR 待审阅 |
 
+## P2 · 后端基础
+
+出口条件（playbook §6.4）：集成测试覆盖登录、刷新、吊销、签名、重放与频控；日志脱敏测试通过。**P1 阶段评审延后由负责人进行（负责人以 `/goal` 要求自行推进）。**
+
+| 编号 | 内容 | 依赖 | 需负责人 | 状态 |
+| --- | --- | --- | --- | --- |
+| [P2-SRV-01](P2-SRV-01.md) | `platform`：env、日志脱敏、OTel、Fastify 工厂、problem+json、健康检查 | P1 | 确认 Q1–Q3（两处偏离 05，readyz 错误码） | PR 待审阅 |
+
 ## 之后
 
 P1 契约与规格（`canonical-spec` 黄金向量、`contracts` 含跳章 WS 消息）见 playbook §6.3；`packages/signed-url` 属 LT-01（P2–P3）。风险原型（iOS 切片拼接与跳章、WebKit 凭证、AudioSeal 开销、真实厂商首段延迟）按 §5.1「风险前置」在 P1–P4 各自首个任务中安排，届时另开任务卡。
