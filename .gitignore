@@ -20,3 +20,4 @@ apps/ios/*.xcodeproj/
 apps/ios/*.xcworkspace/
 apps/ios/.build/
 xcuserdata/
+apps/ios/Vendor/GRDB/

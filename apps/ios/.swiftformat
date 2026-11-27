@@ -1,6 +1,6 @@
 # SwiftFormat 规则（05 §4.4；版本由 .mise.toml 固定）
 --swiftversion 6.0
---exclude .build,PostReader.xcodeproj,Packages/*/.build,**/.build,**/.swiftpm
+--exclude Vendor,.build,PostReader.xcodeproj,Packages/*/.build,**/.build,**/.swiftpm
 --indent 4
 --maxwidth 120
 --wraparguments before-first

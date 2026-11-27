@@ -4,11 +4,14 @@ SIMULATOR ?= iPhone 18 Pro
 DESTINATION ?= platform=iOS Simulator,name=$(SIMULATOR)
 DERIVED ?= .build/DerivedData
 XCODEBUILD = xcodebuild -project PostReader.xcodeproj -scheme PostReader -destination '$(DESTINATION)' \
-	-derivedDataPath $(DERIVED) -skipPackagePluginValidation CODE_SIGNING_ALLOWED=NO
+	-derivedDataPath $(DERIVED) -skipPackagePluginValidation CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual
 
-.PHONY: project lint format build test clean
+.PHONY: vendor project lint format build test clean
 
-project:
+vendor:
+	./Vendor/fetch-grdb.sh
+
+project: vendor
 	$(MISE) xcodegen generate --spec project.yml
 
 lint:

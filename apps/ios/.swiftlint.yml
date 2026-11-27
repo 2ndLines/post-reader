@@ -3,8 +3,10 @@ included:
   - App
   - ShareExtension
   - UITests
+  - AppTests
   - Packages
 excluded:
+  - Vendor
   - .build
   - PostReader.xcodeproj
   - Packages/*/.build

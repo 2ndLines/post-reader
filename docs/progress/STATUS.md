@@ -6,6 +6,7 @@
 P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：6 张卡全部实现。P1 出口条件的两项都已满足：TS 与 Swift 两侧 51 条黄金向量全部通过；`openapi.yaml` 生成的 Swift 客户端能编译（V3）。P1-CTR-04 中有 10 项参数尚未标定（`pnpm check:config` 会逐项列出），需负责人提供；在此之前生产模式拒绝加载。合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P4-IOS-03：GRDB + SQLCipher 加密主库（V2 已验证，ADR 0019 提议）、迁移 v1/v2、Keychain 封装；密码擦除与磁盘无明文在模拟器上通过
 - P4-IOS-02 第一部分：DesignSystem token（颜色、字号、圆角取自冻结原型）与登录组件 5 个；快照 30 张（深浅色 × 3 档字体），连续两次运行一致；01 升到 v1.4
 - P4-IOS-01：iOS 工程基座：XcodeGen 工程、10 个 SPM 包骨架（依赖方向按 01 §3）、xcconfig 与能力、SwiftLint / SwiftFormat、`make project/lint/build/test`；iOS 27.2 模拟器上构建与测试通过（含启动冒烟与 51 组黄金向量）
 - P3-PIPE-02 第一部分：音色分配（整篇冲突图，300 个随机脚本相邻同色为 0）、`select` 输出校验与降级、TTS 输入规范化与切句；LLM 与语种识别部分等厂商
