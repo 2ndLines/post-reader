@@ -8,7 +8,7 @@ export interface ToolVersionInput {
   nvmrc: string;
   packageJson: { packageManager?: string; engines?: { node?: string } };
   workflows: { file: string; content: string }[];
-  /** docker-compose.yml 内容：工作流中的 postgres 镜像必须与之同一 digest（05 §3.2） */
+  /** docker-compose.yml 内容：工作流中与之同仓库的镜像必须完全一致（含 digest，05 §3.2） */
   compose?: string;
 }
 
@@ -74,13 +74,18 @@ export function checkToolVersions(input: ToolVersionInput): string[] {
   }
 
   if (input.compose !== undefined) {
-    const composeImage = /^\s+image:\s+(postgres:\S+)/m.exec(input.compose)?.[1];
+    // compose 中每个镜像的「仓库 → 完整引用」；工作流里用到同一仓库的镜像时必须完全相同（含 digest）
+    const composeImages = new Map<string, string>();
+    for (const m of input.compose.matchAll(/^\s+image:\s+(\S+)/gm)) {
+      const ref = m[1] as string;
+      composeImages.set(ref.split(/[:@]/)[0] as string, ref);
+    }
     for (const workflow of input.workflows) {
-      for (const match of workflow.content.matchAll(/^\s+image:\s+(postgres:\S+)/gm)) {
-        if (match[1] !== composeImage) {
-          errors.push(
-            `${workflow.file} 中的 ${match[1]} 与 docker-compose.yml 的 ${composeImage ?? '（未找到）'} 不一致`,
-          );
+      for (const match of workflow.content.matchAll(/^\s+image:\s+(\S+)/gm)) {
+        const ref = match[1] as string;
+        const expected = composeImages.get(ref.split(/[:@]/)[0] as string);
+        if (expected !== undefined && ref !== expected) {
+          errors.push(`${workflow.file} 中的 ${ref} 与 docker-compose.yml 的 ${expected} 不一致`);
         }
       }
     }

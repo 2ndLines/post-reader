@@ -38,6 +38,7 @@
 | --- | --- | --- | --- | --- |
 | [P2-SRV-01](P2-SRV-01.md) | `platform`：env、日志脱敏、OTel、Fastify 工厂、problem+json、健康检查 | P1 | 确认 Q1–Q3（两处偏离 05，readyz 错误码） | PR 待审阅 |
 | [P2-SRV-02](P2-SRV-02.md) | `platform/db` 与身份相关的 5 张表、集成测试、迁移不可变检查 | SRV-01 | Q2：是否接受 Testcontainers 依赖树中的 BlueOak 许可证 | PR 待审阅 |
+| [P2-SRV-03](P2-SRV-03.md) | `platform/redis`：令牌桶 Lua、nonce、R_daily、会话吊销、验证码冷却 | SRV-01 | Q1（超限时计数是否回退） | PR 待审阅 |
 
 ## 之后
 
