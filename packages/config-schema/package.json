@@ -1,0 +1,26 @@
+{
+  "name": "@post-reader/config-schema",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "config/ 下各类配置文件的 zod 校验（00 §3.4、§5）；未标定参数用显式标记表示，生产环境拒绝未标定值",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@post-reader/contracts": "workspace:*",
+    "yaml": "2.9.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@post-reader/tooling": "workspace:*",
+    "@types/node": "26.6.6",
+    "@vitest/coverage-v8": "5.1.1",
+    "typescript": "7.0.2",
+    "vitest": "5.1.1"
+  }
+}

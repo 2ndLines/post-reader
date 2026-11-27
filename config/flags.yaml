@@ -1,0 +1,21 @@
+# 特性开关（02 §9、§18.1）。runtime: true 的开关可由后台在运行时覆盖（白名单）；client: true 的经 GET /me 的 flags 下发。
+# 键名为默认命名，待负责人确认（P1-CTR-04 Q2）。schema：packages/config-schema（FlagsConfig）
+flags:
+  jobs.paused:
+    description: 暂停受理新任务（返回 503 SERVICE_PAUSED）
+    default: false
+    runtime: true
+    client: true
+  branch.translate.enabled:
+    description: 跨语种分支；关闭后跨语种请求返回 BRANCH_DISABLED
+    default: true
+    runtime: true
+    client: true
+  siteRules.disabled:
+    description: 停用的站点规则 ID 列表；命中返回 SITE_RULE_DISABLED
+    default: []
+    runtime: true
+  quota.chargeSharedCacheHit:
+    description: 公共缓存命中是否按时长扣点（02 §9；D2 默认开启）
+    default: true
+    runtime: false

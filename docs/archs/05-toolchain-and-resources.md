@@ -334,7 +334,7 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 | `tsx` | 运行 TS 脚本 | 根 | P0 | 已定 | 仅脚本与开发；生产镜像运行编译产物 |
 | `zod` | schema 唯一来源 | `packages/contracts`、`packages/config-schema` | P1 | 已定 | 前后端共用；schema 只在 `contracts` 定义 |
 | `@asteasolutions/zod-to-openapi` | zod → `openapi.yaml` | `packages/contracts` | P1 | 已定（V3 已验证） | 生成产物入库，CI 校验与源一致（`pnpm contracts:check`）；只在生成进程中引入，不从 `index.ts` 导出 |
-| `yaml` | 序列化 `openapi.yaml` | `packages/contracts`（开发依赖） | P1 | 已定 | 原登记为 P3（台架），因契约生成提前到 P1 |
+| `yaml` | 序列化 `openapi.yaml`；解析 `config/*.yaml` | `packages/contracts`（开发依赖）、`packages/config-schema` | P1 | 已定 | 原登记为 P3（台架），因契约生成与配置校验提前到 P1；解析后必须过 zod 校验 |
 | `openapi-typescript` | OpenAPI → TS 类型（admin） | `apps/admin-web` | P9 | 已定 | 生成文件不手改 |
 
 ### 4.2 后端（`apps/server`）
