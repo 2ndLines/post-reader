@@ -1,0 +1,17 @@
+{
+  "$comment": "许可证策略，来源 05 §2.2。allowed 直接使用；conditional 允许但输出提示（条件写在值里）；不在两者中的许可证只能通过 exceptions 逐包放行，并写明原因与依据（ADR 或 05 条款）。",
+  "allowed": [
+    "MIT",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "0BSD",
+    "Zlib",
+    "Unlicense"
+  ],
+  "conditional": {
+    "MPL-2.0": "允许，但不修改其源文件；需修改时写 ADR（05 §2.2）"
+  },
+  "exceptions": []
+}

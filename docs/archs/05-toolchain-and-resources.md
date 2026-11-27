@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.3（2026-11-26） |
+| 文档版本 | v1.4（2026-11-26） |
 | v1.1 变更 | Xcode 27 构建基线；新增 VisionKit；说明 iOS 27 SDK 忽略 `UIDesignRequiresCompatibility`、快照覆盖 iOS 18 与 iOS 27 的原因；依据改为主 PRD v2.7 草案 |
 | v1.2 变更 | 新增 §3.8 Cloudflare 边缘与存储、§11 长远方案登记（Hono、Wrangler、AudioSeal、C2PA 等）；国内 Redis 改为开源版 7.0，海外对象存储改为 R2 |
+| v1.4 变更 | P0-CI-01：§5.3 `ci` 步骤与 gitleaks 改用 CLI；§2.2 许可证清单位置 |
 | v1.3 变更 | P0-REPO-01 落地后回写：npm 依赖一律写精确版本（§2.4）；pnpm 11 起以 `allowBuilds` 取代 `onlyBuiltDependencies`（§2.5、附录 B）；遥测变量改由 `.mise.toml [env]` 设置（§2.6）；§4.1 补登记 `@vitest/coverage-v8`、`@types/node`，`typescript`、`vitest` 位置改为各包；Biome 不格式化 Markdown；管理后台目录统一为 `apps/admin-web` |
 | 依据 | 主 PRD v2.7 草案；架构文档 00–04；`ai-dev-playbook.md` |
 | 读者 | 负责人；执行开发的 AI 编程助手 |
@@ -103,7 +104,7 @@ P0–P12 与 `ai-dev-playbook.md` 第 6 节一致：P0 工程基座 · P1 契约
 | 有条件 | AGPL-3.0 | 只允许作为独立的命令行工具在本地或 CI 使用（如 k6），不得作为库进入任何产物或运行时镜像 |
 | 禁止 | GPL（进入产物时）、SSPL、BUSL 等源码可见但限制使用的许可证、无许可证 | 不引入 |
 
-CI 每次运行 `pnpm licenses list --json` 并与允许列表比对；iOS 依赖在 P11 发布前人工核对一次。
+CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm check:licenses`；清单在 `tools/ci-checks/license-policy.json`，有条件许可证输出提示，其余只能逐包写入 `exceptions` 并注明依据）；iOS 依赖在 P11 发布前人工核对一次。
 
 ### 2.3 一类一库
 
@@ -446,7 +447,7 @@ iOS 依赖的额外规则：
 
 | 工作流 | 触发 | 主要步骤 | 使用的 Action |
 | --- | --- | --- | --- |
-| `ci` | PR、`main` | 安装 → Biome → 类型检查 → 单元测试 → gitleaks → 许可证检查 → `pnpm audit` | `actions/checkout`、`pnpm/action-setup`、`actions/setup-node`、`gitleaks/gitleaks-action` |
+| `ci` | PR、`main` | 安装 → 工具版本一致性 → Action SHA 检查 → Biome → 类型检查 → 单元测试 → gitleaks → 许可证检查 → `pnpm audit` | `actions/checkout`、`pnpm/action-setup`、`actions/setup-node`；gitleaks 用官方发布的 CLI 二进制（MIT，按 sha256 校验，版本与 `.mise.toml` 一致），不用 `gitleaks/gitleaks-action`（v2 起改为限制性许可证，违反 §2.2） |
 | `integration` | PR（改动后端或契约时）、`main` | Testcontainers 集成测试 | 同上 |
 | `contracts` | PR（改动 `packages/contracts`、`canonical-spec`） | 生成物与源一致；黄金向量 | 同上 |
 | `build-images` | `main` | 构建 `server`、`server-audio` → SBOM → 扫描 → 推送 ECR（ACR 在 P10 加入） | `docker/setup-buildx-action`、`docker/build-push-action`、`aws-actions/configure-aws-credentials`、`anchore/sbom-action`、`anchore/scan-action` |
