@@ -224,6 +224,9 @@ importers:
       ioredis:
         specifier: 6.1.0
         version: 6.1.0
+      jose:
+        specifier: 6.2.18
+        version: 6.2.18
       pino:
         specifier: 10.4.0
         version: 10.4.0
@@ -2024,6 +2027,9 @@ packages:
     resolution: {integrity: sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ==}
     hasBin: true
 
+  jose@6.2.18:
+    resolution: {integrity: sha512-doV4thUwgkrycJH4yLeqwTGIIZphHl+pk7CPReuMIhYhncmgzdko85MaCG4YQFTxqMFr1/oEH32tZuKKovcDEg==}
+
   js-tokens@10.0.1:
     resolution: {integrity: sha512-XMt+uh+yEs6srFvEb/pEe4IMvbtoXVdNxF7lZFU+I9sdWI641L97L+gXQMTGm1x3RjPUVizNVjHueclXr0U7sw==}
 
@@ -3721,6 +3727,8 @@ snapshots:
   is-fullwidth-code-point@3.0.0: {}
 
   jiti@2.7.0: {}
+
+  jose@6.2.18: {}
 
   js-tokens@10.0.1: {}
 
