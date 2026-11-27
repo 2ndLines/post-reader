@@ -1,11 +1,12 @@
 # 项目进度
 
-最后更新：2026-11-26（P0 全部实现；P1-SPEC-01 实现，PR 待审阅）
+最后更新：2026-11-26（P0 全部实现；P1-SPEC-01、P1-IOS-01 实现，PR 待审阅）
 
 ## 当前阶段
-P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：P1-SPEC-01 已实现（草案）。合规确认与供应商选型并行等待中。
+P0 工程基座：6 张卡全部实现，PR 待审阅。P1 契约与规格：P1-SPEC-01（草案）与 P1-IOS-01 已实现，TS 与 Swift 两侧 51 条黄金向量全部通过。合规确认与供应商选型并行等待中。
 
 ## 已完成（最近 10 项）
+- P1-IOS-01：`apps/ios/Packages/ReaderCore`（Swift 6，只依赖 Foundation 与 CryptoKit），51 条向量在 macOS 宿主机与 iOS 27.2 模拟器上全部通过
 - P1-SPEC-01：`packages/canonical-spec` 的 SPEC.md（草案）、TS 参考实现、7 类 51 条黄金向量（摘要由独立的 Python 实现计算）
 - P0-REPO-04：`.claude/` 权限、4 个 hook（失败即关闭，41 个单元测试）、2 个审阅子代理、18 个 skill、`.mcp.json`（只含 github）
 - P0-REPO-05：`pnpm dev` 本地容器（四服务健康检查）；V1 5/5、V4 15/15 通过（ADR 0017）；V5：国内区配置包签名改用 ECDSA P-256（ADR 0018）
