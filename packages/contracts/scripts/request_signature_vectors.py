@@ -62,8 +62,9 @@ def main():
         OUT.write_text(text, encoding="utf-8")
         print(f"已写入 {OUT.name}：{len(CASES)} 条")
         return 0
-    same = OUT.exists() and OUT.read_text(encoding="utf-8") == text
-    print(f"请求签名向量：{'一致' if same else '不一致'}")
+    # 按内容比较：文件可能被格式化工具（Biome）改过排版，排版不同不算不一致
+    same = OUT.exists() and json.loads(OUT.read_text(encoding="utf-8")) == vectors
+    print(f"请求签名向量：{'一致' if same else '不一致（请运行 --write 重新生成，不要手改）'}")
     return 0 if same else 1
 
 
