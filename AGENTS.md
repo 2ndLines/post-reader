@@ -13,18 +13,28 @@
 - 进度：docs/progress/STATUS.md
 
 ## 目录
-apps/ios  apps/server  apps/admin-web  apps/testbench  apps/edge
+apps/ios  apps/server  apps/admin-web  apps/testbench  apps/edge（各含 AGENTS.md）
 packages/contracts  packages/canonical-spec  packages/ui  packages/config-schema  packages/signed-url
-config/（配置即代码）  evals/（样本与门禁）  infra/（Pulumi）  docs/
+config/（配置即代码）  evals/（样本与门禁）  infra/（Pulumi）  tools/（仓库内工具与 CI 检查）  docs/
 
 ## 命令
-pnpm verify              # lint + typecheck + 单元测试（宣称完成前必须通过）
-pnpm test:int            # 集成测试
-pnpm contracts:gen       # 生成 openapi.yaml
-pnpm spec:vectors        # 黄金向量
-pnpm db:migrate:new X    # 生成迁移
-make -C apps/ios project && make -C apps/ios lint test
-pnpm testbench run --suite pr --region intl
+工具版本由 `.mise.toml` 固定：先 `mise install`，之后命令都在 mise 环境中运行。
+
+| 命令 | 作用 | 状态 |
+| --- | --- | --- |
+| `pnpm i` | 安装依赖，并安装 git 钩子（lefthook） | 可用 |
+| `pnpm verify` | Biome + 类型检查 + 单元测试 | 可用；宣称完成前必须通过 |
+| `pnpm knip` | 未使用的文件、导出、依赖 | 可用 |
+| `pnpm check:versions` / `check:pins` / `check:licenses` / `check:codeowners` / `check:links` | CI 中的仓库级检查（工具版本、Action SHA、许可证、CODEOWNERS、文档链接） | 可用 |
+| `pnpm dev` | Docker Compose 拉起本地依赖 | P0-REPO-05 起 |
+| `pnpm contracts:gen` | 生成 `openapi.yaml` | P1-CTR-02 起 |
+| `pnpm spec:vectors` | 黄金向量 | P1-SPEC-01 起 |
+| `pnpm test:int` | 集成测试 | P2-SRV-02 起 |
+| `pnpm db:migrate:new X` | 生成迁移 | P2-SRV-02 起 |
+| `pnpm testbench run --suite pr --region intl` | 测试台架 | P3-TB-01 起 |
+| `make -C apps/ios project && make -C apps/ios lint test` | iOS 工程与测试 | P4-IOS-01 起 |
+
+各端补充规则见 `apps/*/AGENTS.md`。
 
 ## 红线
 - 不记录或外发：帖子正文、评论、译文、URL、Cookie、邮箱、用户 ID 与内容的关联

@@ -18,7 +18,8 @@
     "check:licenses": "node tools/ci-checks/src/cli/licenses.ts",
     "check:pins": "node tools/ci-checks/src/cli/action-pins.ts",
     "check:versions": "node tools/ci-checks/src/cli/tool-versions.ts",
-    "check:codeowners": "node tools/ci-checks/src/cli/codeowners.ts"
+    "check:codeowners": "node tools/ci-checks/src/cli/codeowners.ts",
+    "check:links": "node tools/ci-checks/src/cli/links.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.8",

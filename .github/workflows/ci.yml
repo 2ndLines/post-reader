@@ -56,6 +56,9 @@ jobs:
       - name: CODEOWNERS 覆盖受保护路径
         run: pnpm check:codeowners
 
+      - name: 文档相对链接
+        run: pnpm check:links
+
       - name: Biome
         run: pnpm exec biome ci .
 
