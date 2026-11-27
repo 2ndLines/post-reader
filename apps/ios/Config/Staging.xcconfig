@@ -1,0 +1,5 @@
+#include "Base.xcconfig"
+// 预发域名在 P3-INFRA-01 之后填入
+API_HOST_INTL = staging-intl.invalid
+API_HOST_CN = staging-cn.invalid
+APP_ATTEST_ENVIRONMENT = production

@@ -1,0 +1,5 @@
+#include "Base.xcconfig"
+// 本地后端（pnpm dev + apps/server）；模拟器访问宿主机用 localhost
+API_HOST_INTL = localhost:3000
+API_HOST_CN = localhost:3000
+APP_ATTEST_ENVIRONMENT = development

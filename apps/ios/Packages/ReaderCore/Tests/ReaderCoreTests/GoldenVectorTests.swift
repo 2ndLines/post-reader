@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import ReaderCore
+import Testing
 
 /// 与 TS 侧共用 packages/canonical-spec/vectors/*.json（01 §19）。
 /// P4 引入 `make project` 前，通过 #filePath 定位仓库中的向量目录，不复制副本。
@@ -11,12 +11,15 @@ struct Vector: Decodable, Sendable, CustomTestStringConvertible {
     let authorId: String
     let expectedClean: String
     let expectedHash: String
-    var testDescription: String { name }
+    var testDescription: String {
+        name
+    }
 }
 
 enum Vectors {
     /// 本文件位于 <仓库>/apps/ios/Packages/ReaderCore/Tests/ReaderCoreTests/，向上 7 级是仓库根目录
-    static let repoRoot: URL = (0..<7).reduce(URL(fileURLWithPath: #filePath)) { url, _ in url.deletingLastPathComponent() }
+    static let repoRoot: URL = (0 ..< 7)
+        .reduce(URL(fileURLWithPath: #filePath)) { url, _ in url.deletingLastPathComponent() }
     static let directory = repoRoot.appendingPathComponent("packages/canonical-spec/vectors")
 
     static let files = ["bidi", "cjk", "edge-cases", "emoji-zwj", "html-entities", "whitespace", "zero-width"]
@@ -56,7 +59,12 @@ struct GoldenVectorTests {
 
 @Suite("lp 与 SHA-256（手算期望值）")
 struct HashPrimitiveTests {
-    @Test(arguments: [("", "00000000"), ("ab", "000000026162"), ("你", "00000003e4bda0"), ("\u{1F44D}", "00000004f09f918d")])
+    @Test(arguments: [
+        ("", "00000000"),
+        ("ab", "000000026162"),
+        ("你", "00000003e4bda0"),
+        ("\u{1F44D}", "00000004f09f918d"),
+    ])
     func lp(_ value: String, _ expected: String) {
         #expect(UnitHasher.lp(value).map { String(format: "%02x", $0) }.joined() == expected)
     }

@@ -1,0 +1,54 @@
+# SwiftLint 规则（05 §4.4：规则文件在 apps/ios/ 根；版本由 .mise.toml 固定）
+included:
+  - App
+  - ShareExtension
+  - UITests
+  - Packages
+excluded:
+  - .build
+  - PostReader.xcodeproj
+  - Packages/*/.build
+  - Packages/APIClient/Sources/APIClient/openapi.yaml
+  - "**/.build"
+  - "**/.swiftpm"
+opt_in_rules:
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - empty_count
+  - first_where
+  - sorted_first_last
+  - private_swiftui_state
+  - accessibility_label_for_image
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+# 与 SwiftFormat 的 --commas always 一致
+trailing_comma:
+  mandatory_comma: true
+line_length:
+  warning: 120
+  error: 160
+  ignores_comments: true
+# 清洗与摘要的码点循环习惯用单字母变量（ReaderCore）
+identifier_name:
+  min_length: 1
+type_body_length: 400
+file_length: 800
+custom_rules:
+  no_observable_object:
+    name: 不使用 ObservableObject
+    regex: ':\s*ObservableObject\b'
+    message: 用 @Observable（apps/ios/AGENTS.md；Share Extension 例外时在该行加 swiftlint:disable:this）
+    severity: error
+  no_unchecked_sendable:
+    name: 不用 @unchecked Sendable 压制并发错误
+    regex: '@unchecked\s+Sendable'
+    severity: error
+  no_nonisolated_unsafe:
+    name: 不用 nonisolated(unsafe)
+    regex: 'nonisolated\(unsafe\)'
+    severity: error
+  no_dispatch_queue_lock:
+    name: 不用 DispatchQueue 加锁
+    regex: 'DispatchQueue\([^)]*label'
+    severity: error
