@@ -1,0 +1,6 @@
+generate:
+  - types
+  - client
+accessModifier: public
+# 生成符合 Swift 习惯的名称（例如 DAILY_LIMIT → dailyLimit）
+namingStrategy: idiomatic

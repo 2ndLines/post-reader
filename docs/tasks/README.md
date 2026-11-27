@@ -26,6 +26,7 @@
 | [P1-SPEC-01](P1-SPEC-01.md) | `canonical-spec`：SPEC.md、TS 参考实现、黄金向量 | P0 | 确认 Q1–Q7，冻结 schemaVersion | PR 待审阅 |
 | [P1-IOS-01](P1-IOS-01.md) | `ReaderCore`：Swift 清洗与摘要，读取同一组向量 | SPEC-01 | — | PR 待审阅 |
 | [P1-CTR-01](P1-CTR-01.md) | `contracts`：基础枚举、`CanonicalPost`、错误码、problem+json | SPEC-01 | 确认 Q1（400 与 422） | PR 待审阅 |
+| [P1-CTR-02](P1-CTR-02.md) | 公共 API 契约、`openapi.yaml` 生成与 Swift 客户端（V3） | CTR-01、CTR-03 | 确认 Q1–Q3（响应结构、请求头） | PR 待审阅 |
 | [P1-CTR-03](P1-CTR-03.md) | WebSocket 消息类型与兼容性测试 | CTR-01 | 确认 Q1（降级原因取值） | PR 待审阅 |
 
 ## 之后

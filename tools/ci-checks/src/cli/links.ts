@@ -4,7 +4,16 @@ import { extractLinks, toRelativePath } from '../links.ts';
 import { repoRoot } from './repo.ts';
 
 /** 检查范围：docs/ 全部 Markdown、各级 AGENTS.md 与 README.md（不进入 node_modules 等目录） */
-const SKIP_DIRS = new Set(['node_modules', '.git', '.turbo', 'coverage', 'dist', '.remember']);
+const SKIP_DIRS = new Set([
+  'node_modules',
+  '.git',
+  '.turbo',
+  'coverage',
+  'dist',
+  '.remember',
+  '.build',
+  '.swiftpm',
+]);
 
 function collect(dir: string, out: string[]): string[] {
   for (const name of readdirSync(dir)) {

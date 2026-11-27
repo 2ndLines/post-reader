@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.6（2026-11-26） |
+| 文档版本 | v1.7（2026-11-26） |
 | v1.1 变更 | Xcode 27 构建基线；新增 VisionKit；说明 iOS 27 SDK 忽略 `UIDesignRequiresCompatibility`、快照覆盖 iOS 18 与 iOS 27 的原因；依据改为主 PRD v2.7 草案 |
 | v1.2 变更 | 新增 §3.8 Cloudflare 边缘与存储、§11 长远方案登记（Hono、Wrangler、AudioSeal、C2PA 等）；国内 Redis 改为开源版 7.0，海外对象存储改为 R2 |
+| v1.7 变更 | P1-CTR-02：V3 已验证；`zod-to-openapi` 状态改为已定，`yaml`、swift-openapi 三件套提前到 P1 |
 | v1.6 变更 | P0-REPO-04：§6.6 补充 hooks 的实现约束（失败即关闭、变量写法、依赖 jq、只拦截文件工具）；附录 E 改为以仓库 `.claude/` 为准并列出差异 |
 | v1.5 变更 | P0-REPO-05：§1.2 V1、V4、V5 已验证（ADR 0017、0018）；§5.1 pulumi 提前固定 |
 | v1.4 变更 | P0-CI-01：§5.3 `ci` 步骤与 gitleaks 改用 CLI；§2.2 许可证清单位置 |
@@ -73,6 +74,7 @@ P0–P12 与 `ai-dev-playbook.md` 第 6 节一致：P0 工程基座 · P1 契约
 | | **已验证（2026-11-26）**：5 项全部通过，维持 Node 26；实现约束见 ADR 0017 | | |
 | V2 | GRDB + SQLCipher 的 SPM 集成方式（Share Extension 与主 App 共用） | P4 首个任务 | 换用 SQLCipher 官方 SPM 包 + GRDB 的自定义构建方式；仍不行则停下报告 |
 | V3 | `@asteasolutions/zod-to-openapi` 与所用 zod 主版本兼容，生成结果能被 swift-openapi-generator 消费 | P1 | 改用 zod 自带的 JSON Schema 导出加自写 OpenAPI 组装脚本 |
+| | **已验证（2026-11-26，P1-CTR-02）**：zod 4.6.7 + zod-to-openapi 9.1.0 生成 OpenAPI 3.1.0；swift-openapi-generator 1.14 生成的客户端在 macOS 与 iOS 27.2 模拟器上编译并通过测试。约束：zod 4 的 `openapi()` 只挂到补丁之后创建的 schema 上，所以 `extendZodWithOpenApi` 必须在加载契约之前执行（`src/openapi-setup.ts`） | | |
 | V4 | 本地 S3 替身（SeaweedFS）的预签名 URL、分段上传、`DeleteObjects` 与 AWS S3 / OSS 行为一致 | P0 | 换另一种 S3 替身；集成测试中对象存储相关用例在预发补测 |
 | | **已验证（2026-11-26）**：15 项与 S3 一致，维持 SeaweedFS；差异表（含 OSS 分段下限 100 KB）与预签名 PUT 的 SDK 校验和陷阱见 ADR 0017 | | |
 | V5 | 两区 KMS 是否都支持 Ed25519 非对称签名（配置包签名） | P0 | 不支持的区改用 ECDSA P-256 签名，客户端同时接受两种算法 |
@@ -331,7 +333,8 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 | `knip` | 未使用的文件、导出、依赖 | 根 | P0 | 已定 | CI 每周运行；报告进 Issue |
 | `tsx` | 运行 TS 脚本 | 根 | P0 | 已定 | 仅脚本与开发；生产镜像运行编译产物 |
 | `zod` | schema 唯一来源 | `packages/contracts`、`packages/config-schema` | P1 | 已定 | 前后端共用；schema 只在 `contracts` 定义 |
-| `@asteasolutions/zod-to-openapi` | zod → `openapi.yaml` | `packages/contracts` | P1 | 默认（V3） | 生成产物入库，CI 校验与源一致 |
+| `@asteasolutions/zod-to-openapi` | zod → `openapi.yaml` | `packages/contracts` | P1 | 已定（V3 已验证） | 生成产物入库，CI 校验与源一致（`pnpm contracts:check`）；只在生成进程中引入，不从 `index.ts` 导出 |
+| `yaml` | 序列化 `openapi.yaml` | `packages/contracts`（开发依赖） | P1 | 已定 | 原登记为 P3（台架），因契约生成提前到 P1 |
 | `openapi-typescript` | OpenAPI → TS 类型（admin） | `apps/admin-web` | P9 | 已定 | 生成文件不手改 |
 
 ### 4.2 后端（`apps/server`）
@@ -399,7 +402,7 @@ CI 每次运行 `pnpm -r licenses list --json` 并与允许列表比对（`pnpm 
 | 库 / 工具 | 用途 | 位置 | 阶段 | 状态 | 使用规范 |
 | --- | --- | --- | --- | --- | --- |
 | GRDB.swift（SQLCipher 集成） | 加密 SQLite | `Storage` | P4 | 默认（V2） | 只经 `Storage` 模块；迁移只追加；密钥来自 Keychain，不写日志 |
-| swift-openapi-generator（构建插件）、swift-openapi-runtime、swift-openapi-urlsession | API 客户端 | `APIClient`、`Networking` | P4 | 已定 | 生成代码不入库、不手改；输入是 `packages/contracts/dist/openapi.yaml` 的副本 |
+| swift-openapi-generator（构建插件）、swift-openapi-runtime、swift-openapi-urlsession | API 客户端 | `APIClient`、`Networking` | P1（`APIClient` 包为验证 V3 提前建立；`Networking` 在 P4） | 已定 | 生成代码不入库、不手改；输入是 `packages/contracts/dist/openapi.yaml` 的副本 |
 | sentry-cocoa | 崩溃与性能 | App | P5 | 已定 | 关闭网络面包屑中的 URL、截图、视图层级、Session Replay；`sendDefaultPii = false`；dSYM 在 Xcode Cloud 构建后上传 |
 | SwiftSoup | `direct_html` 规则解析 | `Capture`（仅主 App） | P8 | 已定 | 输入先截断到上限；不在 Share Extension 内使用 |
 | swift-snapshot-testing | 快照测试 | 测试目标 | P4 | 已定 | 不进发布包；快照在 iOS 18 与 iOS 27 模拟器各一套 |
