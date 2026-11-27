@@ -70,6 +70,10 @@ jobs:
       - name: 单元测试
         run: pnpm test
 
+      # P0-REPO-01 AC5 要求无报告；曾有一次回归因本地只跑 verify 而漏掉，故放进每次 CI
+      - name: knip
+        run: pnpm knip
+
       - name: gitleaks
         run: |
           archive="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"

@@ -2,9 +2,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 文档版本 | v1.5（2026-11-26） |
+| 文档版本 | v1.6（2026-11-26） |
 | v1.1 变更 | Xcode 27 构建基线；新增 VisionKit；说明 iOS 27 SDK 忽略 `UIDesignRequiresCompatibility`、快照覆盖 iOS 18 与 iOS 27 的原因；依据改为主 PRD v2.7 草案 |
 | v1.2 变更 | 新增 §3.8 Cloudflare 边缘与存储、§11 长远方案登记（Hono、Wrangler、AudioSeal、C2PA 等）；国内 Redis 改为开源版 7.0，海外对象存储改为 R2 |
+| v1.6 变更 | P0-REPO-04：§6.6 补充 hooks 的实现约束（失败即关闭、变量写法、依赖 jq、只拦截文件工具）；附录 E 改为以仓库 `.claude/` 为准并列出差异 |
 | v1.5 变更 | P0-REPO-05：§1.2 V1、V4、V5 已验证（ADR 0017、0018）；§5.1 pulumi 提前固定 |
 | v1.4 变更 | P0-CI-01：§5.3 `ci` 步骤与 gitleaks 改用 CLI；§2.2 许可证清单位置 |
 | v1.3 变更 | P0-REPO-01 落地后回写：npm 依赖一律写精确版本（§2.4）；pnpm 11 起以 `allowBuilds` 取代 `onlyBuiltDependencies`（§2.5、附录 B）；遥测变量改由 `.mise.toml [env]` 设置（§2.6）；§4.1 补登记 `@vitest/coverage-v8`、`@types/node`，`typescript`、`vitest` 位置改为各包；Biome 不格式化 Markdown；管理后台目录统一为 `apps/admin-web` |
@@ -512,7 +513,8 @@ iOS 依赖的额外规则：
 │  ├─ guard-paths.sh          # PreToolUse：硬性拒绝写入的路径
 │  ├─ format-changed.sh       # PostToolUse：格式化刚改的文件
 │  ├─ note-protected.sh       # PostToolUse：记录触碰的受保护路径
-│  └─ verify-on-stop.sh       # Stop：快速验证
+│  ├─ verify-on-stop.sh       # Stop：快速验证
+│  └─ lib.sh                  # 公共函数（路径换算、经 mise 调用工具）
 ├─ agents/
 │  ├─ reviewer.md
 │  └─ security-reviewer.md
@@ -606,6 +608,15 @@ iOS 依赖的额外规则：
 需审阅（允许修改，但必须在 PR 中标注并由负责人审阅）：见 `ai-dev-playbook.md` §9.4，另加 `.claude/skills/**`、`.claude/agents/**`、`.mcp.json`、`config/**`。
 
 示例见附录 E。
+
+实现约束（P0-REPO-04 实测）：
+
+1. **护栏失败即关闭**：`guard-paths.sh` 只要出现退出码既不是 0 也不是 2 的内部错误，一律改为 2，拒绝写入。原因是 Claude Code 把 PreToolUse 的其他退出码当作非阻断错误，写入会照常进行。
+2. **脚本里的变量一律写成 `${name}`**：在 zh_CN.UTF-8 下，bash 会把紧跟在变量名后面的中文标点当作变量名的一部分（例如 `$rel。`）。在 `set -u` 下这会让脚本以退出码 1 结束，导致护栏失效。测试默认在 UTF-8 locale 下运行。
+3. **依赖 jq**：macOS 自带 `/usr/bin/jq`，GitHub 的 Ubuntu 运行器也有。缺少 jq 时，`guard-paths.sh` 拒绝写入，其余 hook 跳过。
+4. **护栏只拦截文件工具**（Edit、Write、MultiEdit、NotebookEdit），不拦截 shell 命令。对受保护文件的强制约束来自 CODEOWNERS 加规则集（P0-CI-01、P0-REPO-03）。
+5. **生效时机**：`permissions` 与 `hooks` 的改动会热加载，对正在运行的会话立即生效；新增的 skills 会在几分钟内加载，在此之前调用返回 `Unknown skill`。
+6. **测试**：hook 脚本的单元测试在 `tools/ci-checks/src/claude-hooks.test.ts`，以 JSON 作为 stdin 调用脚本，覆盖允许与拒绝两类输入。
 
 ### 6.7 子代理
 
@@ -898,7 +909,16 @@ PostgreSQL 18 官方镜像的数据目录约定与 17 不同，挂载点以镜�
 }
 ```
 
-权限规则的通配写法以所用 Claude Code 版本的文档为准；P0 配置后用几条典型命令实测允许、询问、拒绝三种结果。
+权限规则的通配写法以所用 Claude Code 版本的文档为准。`Bash(x *)` 与 `Bash(x:*)` 等价；求值顺序为 deny → ask → allow。
+
+**P0-REPO-04 之后以仓库中的 `.claude/settings.json` 与 `.claude/hooks/` 为准**，本附录只保留设计时的示意。实际配置与本附录的差异：
+
+- `enabledMcpjsonServers` 在 P0 只有 `github`，其余 MCP 服务器按 §6.3 的阶段加入。
+- deny 补充了嵌套目录下的 `.env*` 与 `*.key`（与 `guard-paths.sh` 一致），以及与 `rm -rf` 等价的 `rm -fr`、`rm -r -f`。
+- allow 补充了只读的 `git show`、`git branch`。
+- PreToolUse 的匹配补充了 `NotebookEdit`。
+- 公共函数放在 `.claude/hooks/lib.sh`。
+- Stop hook 调用的是 `turbo run typecheck test`（仓库中没有 `test:unit` 任务），日志写到 `.claude/state/`（不入库），不写 `/tmp`。
 
 `.claude/hooks/guard-paths.sh`：
 
